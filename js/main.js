@@ -187,7 +187,7 @@ function mouseUpFunction(e) {
             zoomBox.y.start = tmp
         }
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        panning({x:(zoomBox.x.end+zoomBox.x.start)/2, y:(zoomBox.y.end+zoomBox.y.start)/2}, false)
+        panning({x:(zoomBox.x.end+zoomBox.x.start)/2, y:(zoomBox.y.end+zoomBox.y.start)/2}, false, false)
         zoom_selection()
         console.debug(zoomBox)
         var oldId = IDelement
@@ -235,7 +235,7 @@ function mouseDownFunction(e) {
     }
 }
 
-function panning(ipoint, isPoint=true){
+function panning(ipoint, isPoint=true,useOffsets=false){
     var dex, dey;
     if(isPoint)
     {
@@ -246,8 +246,6 @@ function panning(ipoint, isPoint=true){
         dex = -ipoint.x + canvas.width/2
         dey = -ipoint.y + canvas.height/2
     }
-
-
 
     for (var i = 0; i < controlPoint.length; i++) {
         controlPoint[i].x = controlPoint[i].x + dex;
@@ -1086,11 +1084,20 @@ $("canvas").mousewheel(function (ev, val) {
 
     if (initButton) {
         zoom_view(pointShape, controlPoint, val);
+
         var period = paramd.continuity[paramd.indicePrimoBreakPoint];
         redraw1(pointShape, controlPoint, period);
     }
     return;
 });
+
+document.getElementById( "canvas" ).onwheel = function(event){
+    event.preventDefault();
+};
+
+document.getElementById( "canvas" ).onmousewheel = function(event){
+    event.preventDefault();
+};
 
 function gridfun(event) {
 
@@ -1115,7 +1122,6 @@ function gridfun(event) {
 }
 
 function zoom(event) {
-    event.preventDefault();
     if (inblock) return;
 
     if (initButton) {
@@ -1150,6 +1156,7 @@ function zoom_selection(){
 function zoom_view(pointShape, controlPoint, flagwheel, vscale=null) {
 //applica uno zoom ai controlPoint per portarli a pieno schermo/canvas
 //flagwheel e' >0 o <0 a seconda di come sto girando la rotella del mouse
+
     if (flagwheel !== 0) {
         if (flagwheel < 0)
             sc = 1.1;
