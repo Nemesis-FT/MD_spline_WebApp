@@ -4,7 +4,6 @@ const DIGIT = 5;
 const CONSTRAIN = 1; //nel caso curva aperta se =1 usa minimi quadrati vincolati, =0 non vincolati
 
 var param = {
-
     degree: [],
     continuity: [],
     ampiezzaSegmenti: [1],
@@ -18,6 +17,9 @@ var param = {
     indiciPartizioneNodaleT: [],
     indiciPartizioneNodaleS: []
 }
+
+let project = new Project()
+
 
 var NUMBER_POINT = Number($('#npoint').val());
 var paramd;
@@ -38,9 +40,9 @@ var mode = "draw"
 // Dragging flag. If mouse is being dragged, its set to true
 var dragging = false
 // ZoomBox dictionary
-var zoomBox = {x:{start:0, end:0}, y:{start:0, end:0}}
+var zoomBox = {x: {start: 0, end: 0}, y: {start: 0, end: 0}}
 // Visualization offsets
-var offsets = {x:0, y:0}
+var offsets = {x: 0, y: 0}
 
 var gg = 0;
 var gc_col = ["Blue", "Cyan", "Green", "Red", "Yellow", "Magenta", "Black"];
@@ -68,7 +70,9 @@ ctx.lineJoin = 'round';
 canvas.addEventListener('mouseup', mouseUpFunction);
 canvas.addEventListener('mousedown', mouseDownFunction);
 canvas.addEventListener('mousemove', mouseMoveFunction);
-paramd = _.cloneDeep(param);
+addPath()
+paramd = _.cloneDeep(project.paths[project.active_path].getParamd());
+
 
 //prende in input un punto schermo (coord. viewport) e le
 //trasforma in coordinate della griglia (grid)
@@ -105,7 +109,7 @@ canvas.oncontextmenu = function (e) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         var isClosed = $('input[name=isClosed]:checked').val();
-        paramd = _.cloneDeep(param);
+        paramd = _.cloneDeep(project.paths[project.active_path].getParamd());
         var degree = Number($('#degree').val());
         var continuity = Number($('#continuity').val());
 
@@ -130,7 +134,7 @@ canvas.oncontextmenu = function (e) {
             create_grid(gridx, gridy);
 
         NUMBER_POINT = Number($('#npoint').val());
-        myStruct = mainVD_MDspl_new(paramd, (Number(period) + Number(controlPoint.length) + 1), Number(period), degree, continuity, NUMBER_POINT);
+        let myStruct = mainVD_MDspl_new(paramd, (Number(period) + Number(controlPoint.length) + 1), Number(period), degree, continuity, NUMBER_POINT);
         paramd = _.cloneDeep(myStruct.param);
         bs = myStruct.myStruct.bs;
         fl = myStruct.myStruct.fl;
@@ -143,6 +147,74 @@ canvas.oncontextmenu = function (e) {
         return false;
     }
 
+}
+
+function addPath(){
+    project.addPath()
+    initButton = false;
+    let container = document.getElementById("pathList")
+    let element = document.createElement("li")
+    element.className="list-group-item";
+    element.id = "path_"+(project.id-1).toString();
+    container.append(element)
+    let div = document.createElement("div")
+    let paragraph = document.createElement("p")
+    paragraph.textContent="Path "+(project.id-1).toString()
+    element.append(paragraph)
+    let button = document.createElement("button")
+    button.className="btn btn-success";
+    button.setAttribute("onclick", "selectPath("+(project.id-1).toString()+")")
+    button.innerText = "Select";
+    element.append(button)
+    selectPath(project.id-1)
+}
+
+function removePath(){
+    if(project.paths.length<2){
+        alert("One path must remain.")
+        return;
+    }
+    let element = document.getElementById("path_"+project.paths[project.active_path].id)
+    let id
+    try{
+        id = project.paths[project.active_path-1].id;
+    }
+    catch (e){
+        id = project.paths[project.active_path+1].id;
+    }
+    project.popPath()
+    element.remove();
+    selectPath(id, true);
+}
+
+function selectPath(id, nosave=false){
+    // Salvataggio caratteristiche curva
+    if(!nosave) {
+        try {
+            project.paths[project.active_path].paramd = paramd;
+            project.paths[project.active_path].controlPoint = controlPoint
+            project.paths[project.active_path].pointShape = pointShape
+            project.paths[project.active_path].IDlinePoint = IDlinePoint
+            project.paths[project.active_path].IDpointCurve = IDpointCurve
+            project.paths[project.active_path].IDelement = IDelement
+        } catch (e) {
+        }
+    }
+    // Caricamento caratteristiche curva selezionata
+    paramd = project.selectPath(id).paramd
+    controlPoint = project.paths[project.active_path].controlPoint
+    pointShape = project.paths[project.active_path].pointShape
+    IDlinePoint = project.paths[project.active_path].IDlinePoint
+    IDpointCurve = project.paths[project.active_path].IDpointCurve
+    IDelement = project.paths[project.active_path].IDelement
+
+    //Draw della curva caricata
+    redraw1(pointShape, controlPoint, paramd.continuity[paramd.indicePrimoBreakPoint]);
+    let current = document.getElementById("current_path")
+    current.innerText = "Current path is #"+(id).toString();
+    zoom();
+    appendInfo(paramd)
+    //redraw2(pointShape, controlPoint, IDlinePoint);
 }
 
 function mouseUpFunction(e) {
@@ -174,20 +246,20 @@ function mouseUpFunction(e) {
         dragging = false
         mode = "draw"
         var coords = normalize_coords(e)
-        zoomBox.x.end=coords.x
-        zoomBox.y.end=coords.y
-        if(zoomBox.x.end<zoomBox.x.start){
+        zoomBox.x.end = coords.x
+        zoomBox.y.end = coords.y
+        if (zoomBox.x.end < zoomBox.x.start) {
             var tmp = zoomBox.x.end
             zoomBox.x.end = zoomBox.x.start
             zoomBox.x.start = tmp
         }
-        if(zoomBox.y.end<zoomBox.y.start){
+        if (zoomBox.y.end < zoomBox.y.start) {
             var tmp = zoomBox.y.end
             zoomBox.y.end = zoomBox.y.start
             zoomBox.y.start = tmp
         }
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        panning({x:(zoomBox.x.end+zoomBox.x.start)/2, y:(zoomBox.y.end+zoomBox.y.start)/2}, false, false)
+        panning({x: (zoomBox.x.end + zoomBox.x.start) / 2, y: (zoomBox.y.end + zoomBox.y.start) / 2}, false, false)
         zoom_selection()
         console.debug(zoomBox)
         var oldId = IDelement
@@ -199,7 +271,7 @@ function mouseUpFunction(e) {
 
 }
 
-function normalize_coords(e){
+function normalize_coords(e) {
     let element = canvas, offsetX = 0, offsetY = 0, mx, my;
     if (element.offsetParent !== undefined) {
         do {
@@ -227,24 +299,22 @@ function mouseDownFunction(e) {
             IDpointCurve = intersect(e, pointShape);
         }
     }
-    if (mode === "zoom"){
+    if (mode === "zoom") {
         dragging = true
         var coords = normalize_coords(e)
-        zoomBox.x.start=coords.x
-        zoomBox.y.start=coords.y
+        zoomBox.x.start = coords.x
+        zoomBox.y.start = coords.y
     }
 }
 
-function panning(ipoint, isPoint=true,useOffsets=false){
+function panning(ipoint, isPoint = true, useOffsets = false) {
     var dex, dey;
-    if(isPoint)
-    {
+    if (isPoint) {
         dex = ipoint.x - controlPoint[IDelement].x;
         dey = ipoint.y - controlPoint[IDelement].y;
-    }
-    else{
-        dex = -ipoint.x + canvas.width/2
-        dey = -ipoint.y + canvas.height/2
+    } else {
+        dex = -ipoint.x + canvas.width / 2
+        dey = -ipoint.y + canvas.height / 2
     }
 
     for (var i = 0; i < controlPoint.length; i++) {
@@ -293,15 +363,15 @@ function mouseMoveFunction(e) {
             }
         }
     }
-    if(mode==="zoom"){
-        if(dragging){
+    if (mode === "zoom") {
+        if (dragging) {
             var coords = normalize_coords(e)
-            zoomBox.x.end=coords.x
-            zoomBox.y.end=coords.y
+            zoomBox.x.end = coords.x
+            zoomBox.y.end = coords.y
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             redraw1(pointShape, controlPoint, period);
             ctx.fillStyle = "#000000"
-            ctx.rect(zoomBox.x.start, zoomBox.y.start, zoomBox.x.end-zoomBox.x.start, zoomBox.y.end-zoomBox.y.start)
+            ctx.rect(zoomBox.x.start, zoomBox.y.start, zoomBox.x.end - zoomBox.x.start, zoomBox.y.end - zoomBox.y.start)
             ctx.stroke()
         }
     }
@@ -330,7 +400,7 @@ function md_openFile(event) {
     reader.onload = function () {
 
         MyClean();
-        paramd = _.cloneDeep(param);
+        paramd = _.cloneDeep(project.active_path.getParamd());
         var text = reader.result;
         var arrayText = text.split("\n");
         for (var i = 0; i < arrayText.length; i++) {
@@ -795,7 +865,7 @@ function path_openFile(event) {
         paramd.estremoB = paramd.breakPoint[i - 1];
         paramd.indicePrimoBreakPoint = 0;
         paramd.indiceUltimoBreakPoint = numeroSegmenti;
-
+        console.debug("PERIOD", period);
         paramd = isClosedShape(paramd, period);
         paramd = partizioniNodali(paramd);
         paramd.numeroControlPoint = controlPoint.length; //_.sum(param.degree.slice(0,param.numeroSegmenti)-param.continuity.slice(0, param.numeroSegmenti - 1))+param.degree[0] + 1;
@@ -874,6 +944,7 @@ function md_saveFile(event) {
 
 function path_saveFile(event) {
     event.preventDefault();
+
     if (inblock) return;
 
     if (initButton) {
@@ -925,6 +996,9 @@ function path_saveFile(event) {
                 var gc_param = _.cloneDeep(paramd, true);
                 var gc_controlPoint = _.cloneDeep(controlPoint, true);
                 var gc_period = paramd.continuity[paramd.indicePrimoBreakPoint];
+
+                // [!] Chiamate di funzione a num_gc_knotins2d_period con un parametro mancante.
+
                 if (gc_period > -1)
                     var gcStruct = num_gc_knotins2d_period(gc_controlPoint, tt, gc_param);
                 else
@@ -941,16 +1015,21 @@ function path_saveFile(event) {
             j = 0;
             file = "M " + convert(gcControlPoint[j].x.toFixed(DIGIT)) + " " + convert(gcControlPoint[j].y.toFixed(DIGIT));
             j++;
-
+            console.debug(tt)
+            console.debug(gcControlPoint, paramd.degree)
             for (i = paramd.indicePrimoBreakPoint; i < paramd.indiceUltimoBreakPoint; i++) {
+                console.debug(gcControlPoint[j], paramd.breakPoint)
 //console.log(paramd.indicePrimoBreakPoint, i, paramd.degree[i]);
+                if (gcControlPoint[j] === undefined) {
+                    continue;
+                }
                 switch (paramd.degree[i]) {
                     case 1:
                         file += " L " + convert(gcControlPoint[j].x.toFixed(DIGIT)) + " " + convert(gcControlPoint[j].y.toFixed(DIGIT));
                         j++;
                         break;
                     case 2:
-                        if (i > paramd.indicePrimoBreakPoint && paramd.degree[i - 1] != 2) {
+                        if (i > paramd.indicePrimoBreakPoint && paramd.degree[i - 1] !== 2) {
                             file += " Q " + convert(gcControlPoint[j].x.toFixed(DIGIT)) + " " + convert(gcControlPoint[j].y.toFixed(DIGIT));
                             j++;
                             file += " " + convert(gcControlPoint[j].x.toFixed(DIGIT)) + " " + convert(gcControlPoint[j].y.toFixed(DIGIT));
@@ -961,7 +1040,7 @@ function path_saveFile(event) {
                                 file += " T " + convert(gcControlPoint[j].x.toFixed(DIGIT)) + " " + convert(gcControlPoint[j].y.toFixed(DIGIT));
                                 j++;
                             } else {
-                                if (i == paramd.indicePrimoBreakPoint)
+                                if (i === paramd.indicePrimoBreakPoint)
                                     file += " Q ";
                                 else
                                     file += " ";
@@ -988,7 +1067,7 @@ function path_saveFile(event) {
                                 file += " " + convert(gcControlPoint[j].x.toFixed(DIGIT)) + " " + convert(gcControlPoint[j].y.toFixed(DIGIT));
                                 j++;
                             } else {
-                                if (i == paramd.indicePrimoBreakPoint)
+                                if (i === paramd.indicePrimoBreakPoint)
                                     file += " C ";
                                 else
                                     file += " ";
@@ -1091,11 +1170,11 @@ $("canvas").mousewheel(function (ev, val) {
     return;
 });
 
-document.getElementById( "canvas" ).onwheel = function(event){
+document.getElementById("canvas").onwheel = function (event) {
     event.preventDefault();
 };
 
-document.getElementById( "canvas" ).onmousewheel = function(event){
+document.getElementById("canvas").onmousewheel = function (event) {
     event.preventDefault();
 };
 
@@ -1147,13 +1226,13 @@ function zoomArea(event) {
     mode = "zoom"
 }
 
-function zoom_selection(){
-    let vratio = (zoomBox.y.end-zoomBox.y.start)/canvas.height
+function zoom_selection() {
+    let vratio = (zoomBox.y.end - zoomBox.y.start) / canvas.height
     zoom_view(pointShape, controlPoint, -1, vratio)
 
 }
 
-function zoom_view(pointShape, controlPoint, flagwheel, vscale=null) {
+function zoom_view(pointShape, controlPoint, flagwheel, vscale = null) {
 //applica uno zoom ai controlPoint per portarli a pieno schermo/canvas
 //flagwheel e' >0 o <0 a seconda di come sto girando la rotella del mouse
 
@@ -1162,7 +1241,7 @@ function zoom_view(pointShape, controlPoint, flagwheel, vscale=null) {
             sc = 1.1;
         else
             sc = 0.9;
-        if(vscale!=null){
+        if (vscale != null) {
             sc = vscale;
         }
 
@@ -1414,3 +1493,11 @@ function mirrorY(event) {
     }
 }
 
+function showInfoToggle(){
+    let panel = document.getElementById("infoShape")
+    if (panel.style.display === "none") {
+        panel.style.display = "block";
+    } else {
+        panel.style.display = "none";
+    }
+}

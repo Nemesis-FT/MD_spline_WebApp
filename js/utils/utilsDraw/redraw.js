@@ -18,6 +18,9 @@ function redraw1(calculatedPoint, controlPoint, period){
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     if(grid_flag==1)
       create_grid(gridx, gridy);
+    if(controlPoint.length===0){
+        return;
+    }
     if (si_cps == 1){
        createPoint(controlPoint,'black', period);  //control points
     }
