@@ -25,4 +25,30 @@ class Path{
     getParamd(){
         return this.paramd;
     }
+
+    createHTML(container){
+        let element = document.createElement("li")
+        element.className="list-group-item";
+        element.id = "path_"+(this.id).toString();
+        container.append(element)
+        let div = document.createElement("div")
+        let paragraph = document.createElement("p")
+        paragraph.textContent="Path "+(this.id).toString()
+        element.append(paragraph)
+        let button = document.createElement("button")
+        button.className="btn btn-success";
+        button.setAttribute("onclick", "selectPath("+(this.id).toString()+")")
+        button.innerText = "Select";
+        element.append(button)
+        let button2 = document.createElement("button")
+        button2.className="btn btn-info";
+        button2.setAttribute("onclick", "movePathUp("+(this.id).toString()+")")
+        button2.innerText = "Move up";
+        element.append(button2)
+        let button3 = document.createElement("button")
+        button3.className="btn btn-info";
+        button3.setAttribute("onclick", "movePathDown("+(this.id).toString()+")")
+        button3.innerText = "Move down";
+        element.append(button3)
+    }
 }

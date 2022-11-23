@@ -152,20 +152,7 @@ canvas.oncontextmenu = function (e) {
 function addPath(){
     project.addPath()
     initButton = false;
-    let container = document.getElementById("pathList")
-    let element = document.createElement("li")
-    element.className="list-group-item";
-    element.id = "path_"+(project.id-1).toString();
-    container.append(element)
-    let div = document.createElement("div")
-    let paragraph = document.createElement("p")
-    paragraph.textContent="Path "+(project.id-1).toString()
-    element.append(paragraph)
-    let button = document.createElement("button")
-    button.className="btn btn-success";
-    button.setAttribute("onclick", "selectPath("+(project.id-1).toString()+")")
-    button.innerText = "Select";
-    element.append(button)
+    project.createPathHtml("pathList")
     selectPath(project.id-1)
 }
 
@@ -174,7 +161,7 @@ function removePath(){
         alert("One path must remain.")
         return;
     }
-    let element = document.getElementById("path_"+project.paths[project.active_path].id)
+
     let id
     try{
         id = project.paths[project.active_path-1].id;
@@ -183,7 +170,7 @@ function removePath(){
         id = project.paths[project.active_path+1].id;
     }
     project.popPath()
-    element.remove();
+    project.createPathHtml("pathList")
     selectPath(id, true);
 }
 
@@ -215,6 +202,16 @@ function selectPath(id, nosave=false){
     zoom();
     appendInfo(paramd)
     //redraw2(pointShape, controlPoint, IDlinePoint);
+}
+
+function movePathUp(id){
+    project.switchPath(id, true)
+    project.createPathHtml("pathList")
+}
+
+function movePathDown(id){
+    project.switchPath(id, false)
+    project.createPathHtml("pathList")
 }
 
 function mouseUpFunction(e) {
