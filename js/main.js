@@ -43,6 +43,7 @@ var dragging = false
 var zoomBox = {x: {start: 0, end: 0}, y: {start: 0, end: 0}}
 // Visualization offsets
 var offsets = {x: 0, y: 0}
+let renderList = []
 
 var gg = 0;
 var gc_col = ["Blue", "Cyan", "Green", "Red", "Yellow", "Magenta", "Black"];
@@ -71,6 +72,7 @@ canvas.addEventListener('mouseup', mouseUpFunction);
 canvas.addEventListener('mousedown', mouseDownFunction);
 canvas.addEventListener('mousemove', mouseMoveFunction);
 addPath()
+selectPath(0)
 paramd = _.cloneDeep(project.paths[project.active_path].getParamd());
 
 
@@ -174,8 +176,11 @@ function removePath(){
     selectPath(id, true);
 }
 
-function selectPath(id, nosave=false){
+function selectPath(id, nosave=false, dontdraw=false){
     // Salvataggio caratteristiche curva
+    if(id === null || id===undefined){
+        return
+    }
     if(!nosave) {
         try {
             project.paths[project.active_path].paramd = paramd;
@@ -196,10 +201,13 @@ function selectPath(id, nosave=false){
     IDelement = project.paths[project.active_path].IDelement
 
     //Draw della curva caricata
-    redraw1(pointShape, controlPoint, paramd.continuity[paramd.indicePrimoBreakPoint]);
+    if(!dontdraw){
+        redraw1(pointShape, controlPoint, paramd.continuity[paramd.indicePrimoBreakPoint]);
+        //zoom(new Event("", undefined), dontdraw);
+    }
     let current = document.getElementById("current_path")
     current.innerText = "Current path is #"+(id).toString();
-    zoom();
+
     appendInfo(paramd)
     //redraw2(pointShape, controlPoint, IDlinePoint);
 }
@@ -212,6 +220,45 @@ function movePathUp(id){
 function movePathDown(id){
     project.switchPath(id, false)
     project.createPathHtml("pathList")
+}
+
+function setPathRenderList(e){
+    let input = document.getElementById("paths_render")
+    if(input.value===""){
+        renderList=[]
+        return;
+    }
+    let ids_str = input.value.split(",")
+    let ids = []
+    for(let i=0; i<ids_str.length; i++){
+        try{
+            let id = parseInt(ids_str[i])
+            ids.push(id)
+            if(!project.pathExists(id)){
+                alert("Path id "+id+" does not exist.")
+                return;
+            }
+        } catch (e) {
+            alert("Input is not valid.")
+            return;
+        }
+    }
+    renderList = ids;
+    multipleRender();
+}
+
+function multipleRender(){
+    let active_path = project.paths[project.active_path]
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for(let i=0; i<project.paths.length; i++){
+        if(renderList.includes(project.paths[i].id)){
+            console.debug("Rendering "+project.paths[i].id)
+            selectPath(project.paths[i].id, false, true)
+            let e = new Event("", undefined);
+            drawOnlyCurve(e, false);
+        }
+    }
+    selectPath(active_path.id, false, true)
 }
 
 function mouseUpFunction(e) {
@@ -263,9 +310,10 @@ function mouseUpFunction(e) {
 
         var period = paramd.continuity[paramd.indicePrimoBreakPoint];
         redraw1(pointShape, controlPoint, period);
+        if(renderList.length!==0){
+            multipleRender()
+        }
     }
-
-
 }
 
 function normalize_coords(e) {
@@ -325,6 +373,9 @@ function panning(ipoint, isPoint = true, useOffsets = false) {
     //Ridisegno tutto
     var period = paramd.continuity[paramd.indicePrimoBreakPoint];
     redraw1(pointShape, controlPoint, period);
+    if(renderList.length!==0){
+        multipleRender()
+    }
 }
 
 function mouseMoveFunction(e) {
@@ -335,6 +386,9 @@ function mouseMoveFunction(e) {
             IDlinePoint = intersect(e, pointShape);
             if (IDlinePoint !== -1) {
                 redraw2(pointShape, controlPoint, IDlinePoint, paramd.continuity[paramd.indicePrimoBreakPoint]);
+            }
+            if(renderList.length!==0){
+                //multipleRender()
             }
         }
 
@@ -357,6 +411,9 @@ function mouseMoveFunction(e) {
 
 //    pointShape = redraw(bs, fl, controlPoint, period);
                 pointShape = redraw4(bs, controlPoint, pointShape, period, gcind);
+                if(renderList.length!==0){
+                    //multipleRender()
+                }
             }
         }
     }
@@ -370,6 +427,9 @@ function mouseMoveFunction(e) {
             ctx.fillStyle = "#000000"
             ctx.rect(zoomBox.x.start, zoomBox.y.start, zoomBox.x.end - zoomBox.x.start, zoomBox.y.end - zoomBox.y.start)
             ctx.stroke()
+            if(renderList.length!==0){
+                //multipleRender()
+            }
         }
     }
 }
@@ -1159,10 +1219,18 @@ $("canvas").mousewheel(function (ev, val) {
     if (inblock) return;
 
     if (initButton) {
-        zoom_view(pointShape, controlPoint, val);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let active = project.active_path;
+        for(let i=0; i<project.paths.length; i++)
+        {
+            selectPath(project.paths[i].id, false, true)
+            zoom_view(pointShape, controlPoint, val);
 
+
+        }
         var period = paramd.continuity[paramd.indicePrimoBreakPoint];
-        redraw1(pointShape, controlPoint, period);
+        selectPath(project.paths[active].id, false, true)
+        redraw1(pointShape, controlPoint, period, false);
     }
     return;
 });
@@ -1194,10 +1262,13 @@ function gridfun(event) {
     create_grid(gridx, gridy);
     if (initButton) {
         redraw6(pointShape, controlPoint, paramd.continuity[paramd.indicePrimoBreakPoint]);
+        if(renderList.length!==0){
+            multipleRender()
+        }
     }
 }
 
-function zoom(event) {
+function zoom(event, dontclear=false) {
     if (inblock) return;
 
     if (initButton) {
@@ -1214,7 +1285,7 @@ function zoom(event) {
 
         zoom_view(pointShape, controlPoint, 0);
         var period = paramd.continuity[paramd.indicePrimoBreakPoint];
-        redraw1(pointShape, controlPoint, period);
+        redraw1(pointShape, controlPoint, period, !dontclear);
     }
 }
 
@@ -1318,17 +1389,17 @@ function drawMDBS(event) {
     }
 }
 
-function drawOnlyCurve(event) {
+function drawOnlyCurve(event, clear=true) {
     event.preventDefault();
     if (inblock) return;
 
     if (initButton) {
         var period = paramd.continuity[paramd.indicePrimoBreakPoint];
         si_cps = 1 - si_cps;
-        if (si_cps == 1) {
-            redraw6(pointShape, controlPoint, period);
+        if (si_cps === 1) {
+            redraw6(pointShape, controlPoint, period, clear);
         } else {
-            redraw3(pointShape, period);
+            redraw3(pointShape, period, clear);
         }
     }
 }

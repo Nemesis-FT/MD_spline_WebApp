@@ -20,6 +20,15 @@ class Project{
         return null
     }
 
+    pathExists(id){
+        for(let i=0; i<this.paths.length; i++){
+            if(this.paths[i].id===id){
+                return true
+            }
+        }
+        return false
+    }
+
     createPathHtml(container_id){
         let container = document.getElementById(container_id)
         container.innerHTML = "";

@@ -13,9 +13,11 @@ function redraw(bs, fl, controlPoint, pointShape, period){
 
 }
 
-function redraw1(calculatedPoint, controlPoint, period){
+function redraw1(calculatedPoint, controlPoint, period, clear=true){
+    if(clear){
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
     if(grid_flag==1)
       create_grid(gridx, gridy);
     if(controlPoint.length===0){
@@ -55,9 +57,10 @@ function redraw2(pointShape, controlPoint, idPoint, period){
 }
 
 //redraw3 chiama createPoint2 che disegna solo la curva e i break-point (NO i CPs)
-function redraw3(calculatedPoint, period){
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+function redraw3(calculatedPoint, period, clear=true){
+    if(clear){
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
     createPoint2(calculatedPoint,'green',period);  //curve points
 }
 
@@ -85,8 +88,11 @@ function redraw5(calculatedPoint, color){
 }
 
 //redraw6 ridisegna tutto senza ricalcolare nulla
-function redraw6(pointShape, controlPoint, period){
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+function redraw6(pointShape, controlPoint, period, clear=true){
+    if(clear){
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
     if(grid_flag==1)
       create_grid(gridx, gridy);
     if (si_cps == 1){
