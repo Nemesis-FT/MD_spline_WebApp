@@ -249,13 +249,20 @@ function setPathRenderList(e){
 
 function multipleRender(){
     let active_path = project.paths[project.active_path]
+    let active = project.active_path
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     for(let i=0; i<project.paths.length; i++){
         if(renderList.includes(project.paths[i].id)){
-            console.debug("Rendering "+project.paths[i].id)
             selectPath(project.paths[i].id, false, true)
             let e = new Event("", undefined);
-            drawOnlyCurve(e, false);
+            if(active === i){
+                var period = paramd.continuity[paramd.indicePrimoBreakPoint];
+                redraw1(pointShape, controlPoint, period,false);
+            }
+            else{
+                drawOnlyCurve(e, false);
+            }
+
         }
     }
     selectPath(active_path.id, false, true)
@@ -362,17 +369,24 @@ function panning(ipoint, isPoint = true, useOffsets = false) {
         dey = -ipoint.y + canvas.height / 2
     }
 
-    for (var i = 0; i < controlPoint.length; i++) {
-        controlPoint[i].x = controlPoint[i].x + dex;
-        controlPoint[i].y = controlPoint[i].y + dey;
+    let active = project.active_path
+
+    for (let k = 0; k < project.paths.length; k++){
+        selectPath(project.paths[k].id, false, true)
+        for (var i = 0; i < controlPoint.length; i++) {
+            controlPoint[i].x = controlPoint[i].x + dex;
+            controlPoint[i].y = controlPoint[i].y + dey;
+        }
+
+        for (var i = 0; i < pointShape.length; i++) {
+            pointShape[i].x = pointShape[i].x + dex;
+            pointShape[i].y = pointShape[i].y + dey;
+        }
     }
-    for (var i = 0; i < pointShape.length; i++) {
-        pointShape[i].x = pointShape[i].x + dex;
-        pointShape[i].y = pointShape[i].y + dey;
-    }
+    selectPath(project.paths[active].id, false, true)
     //Ridisegno tutto
     var period = paramd.continuity[paramd.indicePrimoBreakPoint];
-    redraw1(pointShape, controlPoint, period);
+    redraw1(pointShape, controlPoint, period,false);
     if(renderList.length!==0){
         multipleRender()
     }
@@ -388,7 +402,7 @@ function mouseMoveFunction(e) {
                 redraw2(pointShape, controlPoint, IDlinePoint, paramd.continuity[paramd.indicePrimoBreakPoint]);
             }
             if(renderList.length!==0){
-                //multipleRender()
+                multipleRender()
             }
         }
 
@@ -412,7 +426,7 @@ function mouseMoveFunction(e) {
 //    pointShape = redraw(bs, fl, controlPoint, period);
                 pointShape = redraw4(bs, controlPoint, pointShape, period, gcind);
                 if(renderList.length!==0){
-                    //multipleRender()
+                    multipleRender()
                 }
             }
         }
@@ -424,12 +438,13 @@ function mouseMoveFunction(e) {
             zoomBox.y.end = coords.y
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             redraw1(pointShape, controlPoint, period);
+            if(renderList.length!==0){
+                multipleRender()
+            }
             ctx.fillStyle = "#000000"
             ctx.rect(zoomBox.x.start, zoomBox.y.start, zoomBox.x.end - zoomBox.x.start, zoomBox.y.end - zoomBox.y.start)
             ctx.stroke()
-            if(renderList.length!==0){
-                //multipleRender()
-            }
+
         }
     }
 }
@@ -1225,8 +1240,6 @@ $("canvas").mousewheel(function (ev, val) {
         {
             selectPath(project.paths[i].id, false, true)
             zoom_view(pointShape, controlPoint, val);
-
-
         }
         var period = paramd.continuity[paramd.indicePrimoBreakPoint];
         selectPath(project.paths[active].id, false, true)
@@ -1296,8 +1309,12 @@ function zoomArea(event) {
 
 function zoom_selection() {
     let vratio = (zoomBox.y.end - zoomBox.y.start) / canvas.height
-    zoom_view(pointShape, controlPoint, -1, vratio)
-
+    let active = project.active_path
+    for(let i=0; i<project.paths.length; i++){
+        selectPath(project.paths[i].id, false, true)
+        zoom_view(pointShape, controlPoint, -1, vratio)
+    }
+    selectPath(project.paths[i].id, false, true)
 }
 
 function zoom_view(pointShape, controlPoint, flagwheel, vscale = null) {
@@ -1396,11 +1413,12 @@ function drawOnlyCurve(event, clear=true) {
     if (initButton) {
         var period = paramd.continuity[paramd.indicePrimoBreakPoint];
         si_cps = 1 - si_cps;
-        if (si_cps === 1) {
+        redraw3(pointShape, period, clear);
+        /*if (si_cps === 1) {
             redraw6(pointShape, controlPoint, period, clear);
         } else {
             redraw3(pointShape, period, clear);
-        }
+        }*/
     }
 }
 
