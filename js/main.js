@@ -202,7 +202,7 @@ function selectPath(id, nosave=false, dontdraw=false){
 
     //Draw della curva caricata
     if(!dontdraw){
-        redraw1(pointShape, controlPoint, paramd.continuity[paramd.indicePrimoBreakPoint]);
+        multipleRender()
         //zoom(new Event("", undefined), dontdraw);
     }
     let current = document.getElementById("current_path")
