@@ -250,7 +250,7 @@ function setPathRenderList(e){
 function multipleRender(){
     let active_path = project.paths[project.active_path]
     let active = project.active_path
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    //ctx.clearRect(0, 0, canvas.width, canvas.height);
     for(let i=0; i<project.paths.length; i++){
         if(renderList.includes(project.paths[i].id)){
             selectPath(project.paths[i].id, false, true)
@@ -386,7 +386,7 @@ function panning(ipoint, isPoint = true, useOffsets = false) {
     selectPath(project.paths[active].id, false, true)
     //Ridisegno tutto
     var period = paramd.continuity[paramd.indicePrimoBreakPoint];
-    redraw1(pointShape, controlPoint, period,false);
+    redraw1(pointShape, controlPoint, period,true);
     if(renderList.length!==0){
         multipleRender()
     }
