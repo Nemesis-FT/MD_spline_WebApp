@@ -20,6 +20,8 @@ class Path{
         this.IDelement = -1;
         this.IDlinePoint = -1;
         this.id = id
+        this.fl = []
+        this.bs = []
     }
 
     getParamd(){

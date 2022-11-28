@@ -40,9 +40,13 @@ function calculateMatrixControl(bs, fl, controlPoint, pointShape, period, ind){
         result[r]  = {x:0, y:0};
 
         for(var j = fl[r][0] ; j <= fl[r][1]; j++){
-
-            result[r].x = result[r].x + (bs[r][j][0] * mycontrolpoint[j].x);
-            result[r].y = result[r].y + (bs[r][j][0] * mycontrolpoint[j].y);
+            try{
+                result[r].x = result[r].x + (bs[r][j][0] * mycontrolpoint[j].x);
+                result[r].y = result[r].y + (bs[r][j][0] * mycontrolpoint[j].y);
+            }
+            catch (e) {
+                console.debug("!!!")
+            }
          }
      }
   }

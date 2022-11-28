@@ -189,6 +189,8 @@ function selectPath(id, nosave=false, dontdraw=false){
             project.paths[project.active_path].IDlinePoint = IDlinePoint
             project.paths[project.active_path].IDpointCurve = IDpointCurve
             project.paths[project.active_path].IDelement = IDelement
+            project.paths[project.active_path].fl = fl
+            project.paths[project.active_path].bs = bs
         } catch (e) {
         }
     }
@@ -199,6 +201,8 @@ function selectPath(id, nosave=false, dontdraw=false){
     IDlinePoint = project.paths[project.active_path].IDlinePoint
     IDpointCurve = project.paths[project.active_path].IDpointCurve
     IDelement = project.paths[project.active_path].IDelement
+    fl = project.paths[project.active_path].fl
+    bs = project.paths[project.active_path].bs
 
     //Draw della curva caricata
     if(!dontdraw){
@@ -316,9 +320,13 @@ function mouseUpFunction(e) {
         var oldId = IDelement
 
         var period = paramd.continuity[paramd.indicePrimoBreakPoint];
-        redraw1(pointShape, controlPoint, period);
+
         if(renderList.length!==0){
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
             multipleRender()
+        }
+        else{
+            redraw1(pointShape, controlPoint, period);
         }
     }
 }
@@ -398,12 +406,13 @@ function mouseMoveFunction(e) {
     if (mode === "draw") {
         if (initButton) {
             IDlinePoint = intersect(e, pointShape);
-            if (IDlinePoint !== -1) {
-                redraw2(pointShape, controlPoint, IDlinePoint, paramd.continuity[paramd.indicePrimoBreakPoint]);
-            }
             if(renderList.length!==0){
                 multipleRender()
             }
+            else if (IDlinePoint !== -1) {
+                redraw2(pointShape, controlPoint, IDlinePoint, paramd.continuity[paramd.indicePrimoBreakPoint]);
+            }
+
         }
 
 
@@ -437,9 +446,11 @@ function mouseMoveFunction(e) {
             zoomBox.x.end = coords.x
             zoomBox.y.end = coords.y
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            redraw1(pointShape, controlPoint, period);
             if(renderList.length!==0){
                 multipleRender()
+            }
+            else{
+                redraw1(pointShape, controlPoint, period);
             }
             ctx.fillStyle = "#000000"
             ctx.rect(zoomBox.x.start, zoomBox.y.start, zoomBox.x.end - zoomBox.x.start, zoomBox.y.end - zoomBox.y.start)
@@ -1243,7 +1254,12 @@ $("canvas").mousewheel(function (ev, val) {
         }
         var period = paramd.continuity[paramd.indicePrimoBreakPoint];
         selectPath(project.paths[active].id, false, true)
-        redraw1(pointShape, controlPoint, period, false);
+        if(renderList.length!==0){
+            multipleRender()
+        }
+        else{
+            redraw1(pointShape, controlPoint, period, false);
+        }
     }
     return;
 });
@@ -1314,7 +1330,7 @@ function zoom_selection() {
         selectPath(project.paths[i].id, false, true)
         zoom_view(pointShape, controlPoint, -1, vratio)
     }
-    selectPath(project.paths[i].id, false, true)
+    selectPath(project.paths[active].id, false, true)
 }
 
 function zoom_view(pointShape, controlPoint, flagwheel, vscale = null) {
@@ -1412,7 +1428,7 @@ function drawOnlyCurve(event, clear=true) {
 
     if (initButton) {
         var period = paramd.continuity[paramd.indicePrimoBreakPoint];
-        si_cps = 1 - si_cps;
+        // = 1 - si_cps;
         redraw3(pointShape, period, clear);
         /*if (si_cps === 1) {
             redraw6(pointShape, controlPoint, period, clear);
