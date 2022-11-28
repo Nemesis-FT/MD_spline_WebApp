@@ -1521,27 +1521,38 @@ function rotate(event) {
 
     if (initButton) {
 //Ruota di 90 gradi in senso antiorario i CP rispetto al proprio baricentro e ridisegna
-        var bar = baricenter(controlPoint);
-        var cx = bar.cx;
-        var cy = bar.cy;
-        var cc = Math.cos(Math.PI / 2);
-        var ss = Math.sin(Math.PI / 2);
-        var temp;
-        for (var i = 0; i < controlPoint.length; i++) {
-            temp = cc * controlPoint[i].x - ss * controlPoint[i].y - cc * cx + ss * cy + cx;
-            controlPoint[i].y = ss * controlPoint[i].x + cc * controlPoint[i].y - ss * cx - cc * cy + cy;
-            controlPoint[i].x = temp;
+        let active = project.active_path;
+        for(let k=0; k<project.paths.length; k++) {
+            selectPath(project.paths[k].id, false, true)
+            var bar = baricenter(controlPoint);
+            var cx = bar.cx;
+            var cy = bar.cy;
+            var cc = Math.cos(Math.PI / 2);
+            var ss = Math.sin(Math.PI / 2);
+            var temp;
+            for (var i = 0; i < controlPoint.length; i++) {
+                temp = cc * controlPoint[i].x - ss * controlPoint[i].y - cc * cx + ss * cy + cx;
+                controlPoint[i].y = ss * controlPoint[i].x + cc * controlPoint[i].y - ss * cx - cc * cy + cy;
+                controlPoint[i].x = temp;
+            }
+            NUMBER_POINT = Number($('#npoint').val());
+
+            pointGcMeshNew = gc_mesh_new(paramd, NUMBER_POINT);
+            var myStruct = gc_MDbspl_valder(paramd, pointGcMeshNew);
+
+            bs = myStruct.bs;
+            fl = myStruct.fl;
+
+            var period = paramd.continuity[paramd.indicePrimoBreakPoint];
+            pointShape = redraw(bs, fl, controlPoint, pointShape, period);
         }
-        NUMBER_POINT = Number($('#npoint').val());
-
-        pointGcMeshNew = gc_mesh_new(paramd, NUMBER_POINT);
-        var myStruct = gc_MDbspl_valder(paramd, pointGcMeshNew);
-
-        bs = myStruct.bs;
-        fl = myStruct.fl;
-
-        var period = paramd.continuity[paramd.indicePrimoBreakPoint];
-        pointShape = redraw(bs, fl, controlPoint, pointShape, period);
+        selectPath(project.paths[active].id, false, true)
+        if(renderList.length!==0){
+            multipleRender()
+        }
+        else{
+            redraw1(pointShape, controlPoint, period, false);
+        }
     }
 }
 
@@ -1551,22 +1562,33 @@ function mirrorX(event) {
 
     if (initButton) {
 //Determina i CP simmetrici rispetto all'asse X per il proprio baricentro e ridisegna
-        var bar = baricenter(controlPoint);
-        var cx = bar.cx;
-        var cy = bar.cy;
-        for (var i = 0; i < controlPoint.length; i++) {
-            controlPoint[i].y = -controlPoint[i].y + 2 * cy;
+        let active = project.active_path;
+        for(let k=0; k<project.paths.length; k++) {
+            selectPath(project.paths[k].id, false, true)
+            var bar = baricenter(controlPoint);
+            var cx = bar.cx;
+            var cy = bar.cy;
+            for (var i = 0; i < controlPoint.length; i++) {
+                controlPoint[i].y = -controlPoint[i].y + 2 * cy;
+            }
+            NUMBER_POINT = Number($('#npoint').val());
+
+            pointGcMeshNew = gc_mesh_new(paramd, NUMBER_POINT);
+            var myStruct = gc_MDbspl_valder(paramd, pointGcMeshNew);
+
+            bs = myStruct.bs;
+            fl = myStruct.fl;
+
+            var period = paramd.continuity[paramd.indicePrimoBreakPoint];
+            pointShape = redraw(bs, fl, controlPoint, pointShape, period);
         }
-        NUMBER_POINT = Number($('#npoint').val());
-
-        pointGcMeshNew = gc_mesh_new(paramd, NUMBER_POINT);
-        var myStruct = gc_MDbspl_valder(paramd, pointGcMeshNew);
-
-        bs = myStruct.bs;
-        fl = myStruct.fl;
-
-        var period = paramd.continuity[paramd.indicePrimoBreakPoint];
-        pointShape = redraw(bs, fl, controlPoint, pointShape, period);
+        selectPath(project.paths[active].id, false, true)
+        if(renderList.length!==0){
+            multipleRender()
+        }
+        else{
+            redraw1(pointShape, controlPoint, period, false);
+        }
     }
 }
 
@@ -1576,22 +1598,33 @@ function mirrorY(event) {
 
     if (initButton) {
 //Determina i CP simmetrici rispetto all'asse Y per il proprio baricentro e ridisegna
-        var bar = baricenter(controlPoint);
-        var cx = bar.cx;
-        var cy = bar.cy;
-        for (var i = 0; i < controlPoint.length; i++) {
-            controlPoint[i].x = -controlPoint[i].x + 2 * cx;
+        let active = project.active_path;
+        for(let k=0; k<project.paths.length; k++){
+            selectPath(project.paths[k].id, false, true)
+            var bar = baricenter(controlPoint);
+            var cx = bar.cx;
+            var cy = bar.cy;
+            for (var i = 0; i < controlPoint.length; i++) {
+                controlPoint[i].x = -controlPoint[i].x + 2 * cx;
+            }
+            NUMBER_POINT = Number($('#npoint').val());
+
+            pointGcMeshNew = gc_mesh_new(paramd, NUMBER_POINT);
+            var myStruct = gc_MDbspl_valder(paramd, pointGcMeshNew);
+
+            bs = myStruct.bs;
+            fl = myStruct.fl;
+
+            var period = paramd.continuity[paramd.indicePrimoBreakPoint];
+            pointShape = redraw(bs, fl, controlPoint, pointShape, period);
         }
-        NUMBER_POINT = Number($('#npoint').val());
-
-        pointGcMeshNew = gc_mesh_new(paramd, NUMBER_POINT);
-        var myStruct = gc_MDbspl_valder(paramd, pointGcMeshNew);
-
-        bs = myStruct.bs;
-        fl = myStruct.fl;
-
-        var period = paramd.continuity[paramd.indicePrimoBreakPoint];
-        pointShape = redraw(bs, fl, controlPoint, pointShape, period);
+        selectPath(project.paths[active].id, false, true)
+        if(renderList.length!==0){
+            multipleRender()
+        }
+        else{
+            redraw1(pointShape, controlPoint, period, false);
+        }
     }
 }
 
