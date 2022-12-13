@@ -44,7 +44,7 @@ var zoomBox = {x: {start: 0, end: 0}, y: {start: 0, end: 0}}
 // Visualization offsets
 var offsets = {x: 0, y: 0}
 let renderList = []
-
+let transform_multilayer = true
 var gg = 0;
 var gc_col = ["Blue", "Cyan", "Green", "Red", "Yellow", "Magenta", "Black"];
 var gridx = [];
@@ -272,6 +272,14 @@ function multipleRender(){
     selectPath(active_path.id, false, true)
 }
 
+function transform_switch(){
+    transform_multilayer = !transform_multilayer;
+}
+
+/*
+
+ */
+
 function mouseUpFunction(e) {
     e.preventDefault();
     if (inblock) return
@@ -380,6 +388,9 @@ function panning(ipoint, isPoint = true, useOffsets = false) {
     let active = project.active_path
 
     for (let k = 0; k < project.paths.length; k++){
+        if(!transform_multilayer && project.paths[k].id!==project.paths[active].id){
+            continue;
+        }
         selectPath(project.paths[k].id, false, true)
         for (var i = 0; i < controlPoint.length; i++) {
             controlPoint[i].x = controlPoint[i].x + dex;
@@ -1249,6 +1260,9 @@ $("canvas").mousewheel(function (ev, val) {
         let active = project.active_path;
         for(let i=0; i<project.paths.length; i++)
         {
+            if(!transform_multilayer && project.paths[i].id!==project.paths[active].id){
+                continue;
+            }
             selectPath(project.paths[i].id, false, true)
             zoom_view(pointShape, controlPoint, val);
         }
@@ -1327,6 +1341,9 @@ function zoom_selection() {
     let vratio = (zoomBox.y.end - zoomBox.y.start) / canvas.height
     let active = project.active_path
     for(let i=0; i<project.paths.length; i++){
+        if(!transform_multilayer && project.paths[i].id!==project.paths[active].id){
+            continue;
+        }
         selectPath(project.paths[i].id, false, true)
         zoom_view(pointShape, controlPoint, -1, vratio)
     }
@@ -1523,6 +1540,9 @@ function rotate(event) {
 //Ruota di 90 gradi in senso antiorario i CP rispetto al proprio baricentro e ridisegna
         let active = project.active_path;
         for(let k=0; k<project.paths.length; k++) {
+            if(!transform_multilayer && project.paths[k].id!==project.paths[active].id){
+                continue;
+            }
             selectPath(project.paths[k].id, false, true)
             var bar = baricenter(controlPoint);
             var cx = bar.cx;
@@ -1564,6 +1584,9 @@ function mirrorX(event) {
 //Determina i CP simmetrici rispetto all'asse X per il proprio baricentro e ridisegna
         let active = project.active_path;
         for(let k=0; k<project.paths.length; k++) {
+            if(!transform_multilayer && project.paths[k].id!==project.paths[active].id){
+                continue;
+            }
             selectPath(project.paths[k].id, false, true)
             var bar = baricenter(controlPoint);
             var cx = bar.cx;
@@ -1600,6 +1623,9 @@ function mirrorY(event) {
 //Determina i CP simmetrici rispetto all'asse Y per il proprio baricentro e ridisegna
         let active = project.active_path;
         for(let k=0; k<project.paths.length; k++){
+            if(!transform_multilayer && project.paths[k].id!==project.paths[active].id){
+                continue;
+            }
             selectPath(project.paths[k].id, false, true)
             var bar = baricenter(controlPoint);
             var cx = bar.cx;
