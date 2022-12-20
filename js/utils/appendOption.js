@@ -109,31 +109,30 @@ function appendOption(idPoint, param){
 //          var temp = [Number(pointGcMeshNew[idPoint].toFixed(DIGIT))];
           var temp = [pointGcMeshNew[idPoint]];
 
-          if (period > -1)
-            var myStruct = num_gc_knotins2d_period(controlPoint, pointShape, temp, param);
-          else
+          if (period > -1){
+            var myStruct = num_gc_knotins2d_period_new(controlPoint, temp, param);
+          }else
             var myStruct = num_gc_knotins2d(controlPoint, temp, param);
 
           param = _.cloneDeep(myStruct.param);
           controlPoint = _.clone(myStruct.controlPoint);
 
-          if (period > -1){
-            period = param.continuity[param.indicePrimoBreakPoint];
-            controlPoint=reduce_controlpoint(controlPoint,period);
-          }
+          // console.log(param);
+          // console.log(controlPoint);
 
           var DrStruct = compute_MDspline(controlPoint,pointShape,pointGcMeshNew,param);
           bs = _.clone(DrStruct.bs);
           fl = _.clone(DrStruct.fl);
           paramd = _.cloneDeep(param);
           pointShape = _.clone(DrStruct.pointShape);
+
           period = paramd.continuity[paramd.indicePrimoBreakPoint];
 //          redraw1(pointShape, controlPoint, period);
           redraw3(pointShape, period);
           appendInfo(paramd);
        }else{
           alert("Operation not permitted! Continuity cannnot be negative");
-       }
+        }
         inblock = false;
         $('#modalBody').empty();
         return;
@@ -157,7 +156,8 @@ function appendOption(idPoint, param){
             tc[j]=param.breakPoint[ide+1];
             j++;
            }
-         }         if (j>0){
+         }        
+         if (j>0){
             if (period > -1)
                var myStruct = num_gc_knotins2d_period(controlPoint, pointShape, tc, param);
             else
@@ -172,7 +172,6 @@ function appendOption(idPoint, param){
          if (period > -1){
             ide=param.indicePrimoBreakPoint + numSeg - 1;
             var myStruct2 = num_gc_pol_de2d_period(controlPoint, pointShape, ide, param);
-
          }else{
             var myStruct2 = num_gc_pol_de2d(controlPoint, ide, param);
          }
@@ -183,7 +182,6 @@ function appendOption(idPoint, param){
               period = param.continuity[param.indicePrimoBreakPoint];
               controlPoint=reduce_controlpoint(controlPoint,period);
          }
-
         var DrStruct = compute_MDspline(controlPoint,pointShape,pointGcMeshNew,param);
         bs = _.clone(DrStruct.bs);
         fl = _.clone(DrStruct.fl);
@@ -218,7 +216,6 @@ function appendOption(idPoint, param){
               j++;
             }
           }
-
           if (j > 0){
             if (period > -1)
               var myStruct = num_gc_knotins2d_period(controlPoint, pointShape, tc, param );
@@ -228,9 +225,10 @@ function appendOption(idPoint, param){
               param = _.cloneDeep(myStruct.param);
               controlPoint = _.clone(myStruct.controlPoint);
               param = _.cloneDeep(partizioniNodali(param));
-              if (period > -1){
+//GC 15/11/22
+//              if (period > -1){
                 period = param.continuity[param.indicePrimoBreakPoint];
-              }
+//              }
           }
 
         if (period > -1){
@@ -241,8 +239,12 @@ function appendOption(idPoint, param){
 
         param = _.cloneDeep(myStruct2.param);
         controlPoint = _.clone(myStruct2.controlPoint);
-        period = param.continuity[param.indicePrimoBreakPoint];
-
+//GC 15/11/22
+//        period = param.continuity[param.indicePrimoBreakPoint];
+        if (period > -1){
+          period = param.continuity[param.indicePrimoBreakPoint];
+          controlPoint=reduce_controlpoint(controlPoint,period);
+     }
         var DrStruct = compute_MDspline(controlPoint,pointShape,pointGcMeshNew,param);
         bs = _.clone(DrStruct.bs);
         fl = _.clone(DrStruct.fl);
@@ -266,18 +268,13 @@ function appendOption(idPoint, param){
 //        console.log(ibp);
         var temp = [pointGcMeshNew[idPoint]];
         var period = param.continuity[param.indicePrimoBreakPoint];
-        if (period > -1)
-          var myStruct = num_gc_knotins2d_period(controlPoint, pointShape, temp, param);
-        else
+        if (period > -1){
+          var myStruct = num_gc_knotins2d_period_new(controlPoint, temp, param);
+        }else
           var myStruct = num_gc_knotins2d(controlPoint, temp, param);
 
         param = _.cloneDeep(myStruct.param);
         controlPoint = _.clone(myStruct.controlPoint);
-
-        if (period > -1){
-          period = param.continuity[param.indicePrimoBreakPoint];
-          controlPoint=reduce_controlpoint(controlPoint,period);
-        }
 
         pointGcMeshNew = gc_mesh_new(param, NUMBER_POINT);
         var DrStruct = compute_MDspline(controlPoint,pointShape,pointGcMeshNew,param);
@@ -294,14 +291,4 @@ function appendOption(idPoint, param){
         return;
     });
 
-}
-
-function reduce_controlpoint(controlPoint,period){
-
-    var mycontrolPoint = [];
-
-    for (var i = 0; i < controlPoint.length-period-1; i++){
-       mycontrolPoint[i] = {x:controlPoint[i].x , y:controlPoint[i].y};
-    }
-return mycontrolPoint
 }
