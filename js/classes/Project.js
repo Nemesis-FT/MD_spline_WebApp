@@ -74,4 +74,13 @@ class Project{
         let current = document.getElementById("current_path")
         current.innerText = "Current path is #"+(id).toString();
     }
+
+    createSVG(paths_dataset){
+        let svg = "<svg xmlns=\"http://www.w3.org/2000/svg\">\n"
+        for(let i = 0; i<paths_dataset.length; i++){
+            svg += "<path d=\""+ paths_dataset[i]+"\"/>\n"
+        }
+        svg+="</svg>\n"
+        return svg;
+    }
 }

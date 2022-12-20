@@ -151,37 +151,36 @@ canvas.oncontextmenu = function (e) {
 
 }
 
-function addPath(){
+function addPath() {
     project.addPath()
     initButton = false;
     project.createPathHtml("pathList")
-    selectPath(project.id-1)
+    selectPath(project.id - 1)
 }
 
-function removePath(){
-    if(project.paths.length<2){
+function removePath() {
+    if (project.paths.length < 2) {
         alert("One path must remain.")
         return;
     }
 
     let id
-    try{
-        id = project.paths[project.active_path-1].id;
-    }
-    catch (e){
-        id = project.paths[project.active_path+1].id;
+    try {
+        id = project.paths[project.active_path - 1].id;
+    } catch (e) {
+        id = project.paths[project.active_path + 1].id;
     }
     project.popPath()
     project.createPathHtml("pathList")
     selectPath(id, true);
 }
 
-function selectPath(id, nosave=false, dontdraw=false){
+function selectPath(id, nosave = false, dontdraw = false) {
     // Salvataggio caratteristiche curva
-    if(id === null || id===undefined){
+    if (id === null || id === undefined) {
         return
     }
-    if(!nosave) {
+    if (!nosave) {
         try {
             project.paths[project.active_path].paramd = paramd;
             project.paths[project.active_path].controlPoint = controlPoint
@@ -205,41 +204,41 @@ function selectPath(id, nosave=false, dontdraw=false){
     bs = project.paths[project.active_path].bs
 
     //Draw della curva caricata
-    if(!dontdraw){
+    if (!dontdraw) {
         multipleRender()
         //zoom(new Event("", undefined), dontdraw);
     }
     let current = document.getElementById("current_path")
-    current.innerText = "Current path is #"+(id).toString();
+    current.innerText = "Current path is #" + (id).toString();
 
     appendInfo(paramd)
     //redraw2(pointShape, controlPoint, IDlinePoint);
 }
 
-function movePathUp(id){
+function movePathUp(id) {
     project.switchPath(id, true)
     project.createPathHtml("pathList")
 }
 
-function movePathDown(id){
+function movePathDown(id) {
     project.switchPath(id, false)
     project.createPathHtml("pathList")
 }
 
-function setPathRenderList(e){
+function setPathRenderList(e) {
     let input = document.getElementById("paths_render")
-    if(input.value===""){
-        renderList=[]
+    if (input.value === "") {
+        renderList = []
         return;
     }
     let ids_str = input.value.split(",")
     let ids = []
-    for(let i=0; i<ids_str.length; i++){
-        try{
+    for (let i = 0; i < ids_str.length; i++) {
+        try {
             let id = parseInt(ids_str[i])
             ids.push(id)
-            if(!project.pathExists(id)){
-                alert("Path id "+id+" does not exist.")
+            if (!project.pathExists(id)) {
+                alert("Path id " + id + " does not exist.")
                 return;
             }
         } catch (e) {
@@ -251,19 +250,18 @@ function setPathRenderList(e){
     multipleRender();
 }
 
-function multipleRender(){
+function multipleRender() {
     let active_path = project.paths[project.active_path]
     let active = project.active_path
     //ctx.clearRect(0, 0, canvas.width, canvas.height);
-    for(let i=0; i<project.paths.length; i++){
-        if(renderList.includes(project.paths[i].id)){
+    for (let i = 0; i < project.paths.length; i++) {
+        if (renderList.includes(project.paths[i].id)) {
             selectPath(project.paths[i].id, false, true)
             let e = new Event("", undefined);
-            if(active === i){
+            if (active === i) {
                 var period = paramd.continuity[paramd.indicePrimoBreakPoint];
-                redraw1(pointShape, controlPoint, period,false);
-            }
-            else{
+                redraw1(pointShape, controlPoint, period, false);
+            } else {
                 drawOnlyCurve(e, false);
             }
 
@@ -272,7 +270,7 @@ function multipleRender(){
     selectPath(active_path.id, false, true)
 }
 
-function transform_switch(){
+function transform_switch() {
     transform_multilayer = !transform_multilayer;
 }
 
@@ -329,11 +327,10 @@ function mouseUpFunction(e) {
 
         var period = paramd.continuity[paramd.indicePrimoBreakPoint];
 
-        if(renderList.length!==0){
+        if (renderList.length !== 0) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             multipleRender()
-        }
-        else{
+        } else {
             redraw1(pointShape, controlPoint, period);
         }
     }
@@ -387,8 +384,8 @@ function panning(ipoint, isPoint = true, useOffsets = false) {
 
     let active = project.active_path
 
-    for (let k = 0; k < project.paths.length; k++){
-        if(!transform_multilayer && project.paths[k].id!==project.paths[active].id){
+    for (let k = 0; k < project.paths.length; k++) {
+        if (!transform_multilayer && project.paths[k].id !== project.paths[active].id) {
             continue;
         }
         selectPath(project.paths[k].id, false, true)
@@ -405,8 +402,8 @@ function panning(ipoint, isPoint = true, useOffsets = false) {
     selectPath(project.paths[active].id, false, true)
     //Ridisegno tutto
     var period = paramd.continuity[paramd.indicePrimoBreakPoint];
-    redraw1(pointShape, controlPoint, period,true);
-    if(renderList.length!==0){
+    redraw1(pointShape, controlPoint, period, true);
+    if (renderList.length !== 0) {
         multipleRender()
     }
 }
@@ -417,10 +414,9 @@ function mouseMoveFunction(e) {
     if (mode === "draw") {
         if (initButton) {
             IDlinePoint = intersect(e, pointShape);
-            if(renderList.length!==0){
+            if (renderList.length !== 0) {
                 multipleRender()
-            }
-            else if (IDlinePoint !== -1) {
+            } else if (IDlinePoint !== -1) {
                 redraw2(pointShape, controlPoint, IDlinePoint, paramd.continuity[paramd.indicePrimoBreakPoint]);
             }
 
@@ -445,7 +441,7 @@ function mouseMoveFunction(e) {
 
 //    pointShape = redraw(bs, fl, controlPoint, period);
                 pointShape = redraw4(bs, controlPoint, pointShape, period, gcind);
-                if(renderList.length!==0){
+                if (renderList.length !== 0) {
                     multipleRender()
                 }
             }
@@ -457,10 +453,9 @@ function mouseMoveFunction(e) {
             zoomBox.x.end = coords.x
             zoomBox.y.end = coords.y
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            if(renderList.length!==0){
+            if (renderList.length !== 0) {
                 multipleRender()
-            }
-            else{
+            } else {
                 redraw1(pointShape, controlPoint, period);
             }
             ctx.fillStyle = "#000000"
@@ -594,313 +589,301 @@ function md_openFile(event) {
     reader.readAsText(input.files[0]);
 }
 
-function path_openFile(event) {
-    event.preventDefault();
-    var input = event.target;
+function path_openFile(data) {
     var numeroSegmenti = 0;
     var ampiezzaSegmenti = [];
-    polydeg=[];
+    polydeg = [];
     var continuity = [];
     var gccont = [];
-    var polyCP=[];
+    var polyCP = [];
     var period = -1;
     var gcstr = [];
     var jj, ind = [];
-    var reader = new FileReader();
-    reader.onload = function(){
 
-        MyClean();
-        paramd = _.cloneDeep(param);
-        var polyStr = reader.result;
-//console.log(polyStr);
-        gck=0;
-        gccod=[];
-        gcnum=[];
-        var codec='mlhvcsqtaz';
-        for (var i=0; i<polyStr.length; i++){
-            res=polyStr.substr(i,1);
-            resL=res.toLowerCase();
-            if (codec.indexOf(resL,0)>=0){
-                gccod[gck]=res;
-                gcnum[gck]=i;
-                gck=gck+1;
-            }
+    MyClean();
+    paramd = _.cloneDeep(param);
+    var polyStr = data;
+    gck = 0;
+    gccod = [];
+    gcnum = [];
+    var codec = 'mlhvcsqtaz';
+    for (var i = 0; i < polyStr.length; i++) {
+        res = polyStr.substr(i, 1);
+        resL = res.toLowerCase();
+        if (codec.indexOf(resL, 0) >= 0) {
+            gccod[gck] = res;
+            gcnum[gck] = i;
+            gck = gck + 1;
         }
-        gcnum[gck]=polyStr.length+1;
-//console.log("gccod,gcnum");
-//console.log(gccod);
-//console.log(gcnum);
-        fin=gccod.length;
-//un subpath puo' essere formato da piu' tratti di curva
-// console.log("fin");
-// console.log(fin);
-        ipoint=[];
-        ipoint[0]=0;
-        ipoint[1]=0;
-        nCP=0;
-
-        for (var i=0; i<fin; i++){
-            res=polyStr.slice(gcnum[i]+1,gcnum[i+1]);
-            res=res.trim();
-            res=res.replace(/ /g,",");
-            res=res.replace(/,,/g,",");
-            arr=res.split(",");
+    }
+    gcnum[gck] = polyStr.length + 1;
+    fin = gccod.length;
+    ipoint = [];
+    ipoint[0] = 0;
+    ipoint[1] = 0;
+    nCP = 0;
+    for (var i = 0; i < fin; i++) {
+        res = polyStr.slice(gcnum[i] + 1, gcnum[i + 1]);
+        res = res.trim();
+        res = res.replace(/ /g, ",");
+        res = res.replace(/,,/g, ",");
+        arr = res.split(",");
 //console.log(arr);
-            polytemp=[];
-            np=arr.length;
-            for (var ii=0; ii<np; ii++){
-                polytemp[ii]=Number(arr[ii]);
-            }
-            if (nCP > 0){
-                ipoint[0]=polyCP[nCP-1].x;
-                ipoint[1]=polyCP[nCP-1].y;
-            }
-            switch (gccod[i]){
-                case 'M':
-                    polyCP.push({'x':polytemp[0], 'y':polytemp[1]});
-                    nCP++;
+        polytemp = [];
+        np = arr.length;
+        for (var ii = 0; ii < np; ii++) {
+            polytemp[ii] = Number(arr[ii]);
+        }
+        if (nCP > 0) {
+            ipoint[0] = polyCP[nCP - 1].x;
+            ipoint[1] = polyCP[nCP - 1].y;
+        }
+        switch (gccod[i]) {
+            case 'M':
+                polyCP.push({'x': polytemp[0], 'y': polytemp[1]});
+                nCP++;
 //console.log("M");
-                    break;
-                case 'L':
-                    for (var ii=1; ii<=np/2; ii++){
-                        polydeg.push(1);
-                        i1=2*(ii-1);
-                        polyCP.push({'x':polytemp[i1], 'y':polytemp[++i1]});
-                        nCP++;
-                        gccont[numeroSegmenti]=0;
-                        numeroSegmenti++;
-                    }
+                break;
+            case 'L':
+                for (var ii = 1; ii <= np / 2; ii++) {
+                    polydeg.push(1);
+                    i1 = 2 * (ii - 1);
+                    polyCP.push({'x': polytemp[i1], 'y': polytemp[++i1]});
+                    nCP++;
+                    gccont[numeroSegmenti] = 0;
+                    numeroSegmenti++;
+                }
 //                    polydeg.push(1);
 //                    polyCP.push({'x':polytemp[0], 'y':polytemp[1]});
 //                    nCP++;
 //                    numeroSegmenti++;
 //console.log("L");
-                    break;
-                case 'm':
-                    polytemp[0]+=ipoint[0];
-                    polytemp[1]+=ipoint[1];
-                    polyCP.push({'x':polytemp[0], 'y':polytemp[1]});
-                    nCP++;
+                break;
+            case 'm':
+                polytemp[0] += ipoint[0];
+                polytemp[1] += ipoint[1];
+                polyCP.push({'x': polytemp[0], 'y': polytemp[1]});
+                nCP++;
 //console.log("m");
-                    break;
-                case 'l':
-                    for (var ii=1; ii<=np/2; ii++){
-                        polydeg.push(1);
-                        i1=2*(ii-1);
-                        polytemp[i1]+=ipoint[0];
-                        polytemp[i1+1]+=ipoint[1];
-                        ipoint[0]=polytemp[i1];
-                        ipoint[1]=polytemp[i1+1];
-                        polyCP.push({'x':polytemp[i1], 'y':polytemp[++i1]});
-                        nCP++;
-                        gccont[numeroSegmenti]=0;
-                        numeroSegmenti++;
-                    }
+                break;
+            case 'l':
+                for (var ii = 1; ii <= np / 2; ii++) {
+                    polydeg.push(1);
+                    i1 = 2 * (ii - 1);
+                    polytemp[i1] += ipoint[0];
+                    polytemp[i1 + 1] += ipoint[1];
+                    ipoint[0] = polytemp[i1];
+                    ipoint[1] = polytemp[i1 + 1];
+                    polyCP.push({'x': polytemp[i1], 'y': polytemp[++i1]});
+                    nCP++;
+                    gccont[numeroSegmenti] = 0;
+                    numeroSegmenti++;
+                }
 //                    polydeg.push(1);
 //                    polytemp[0]+=ipoint[0];
 //                    polytemp[1]+=ipoint[1];
 //                    polyCP.push({'x':polytemp[0], 'y':polytemp[1]});
 //                    nCP++;
 //                    numeroSegmenti++;
-                    break;
-                case 'H':
-                    for (var ii=1; ii<=np; ii++){
-                        polydeg.push(1);
-                        i1=ii-1;
-                        polyCP.push({'x':polytemp[i1], 'y':polyCP[nCP-1].y});
-                        nCP++;
-                        gccont[numeroSegmenti]=0;
-                        numeroSegmenti++;
-                    }
+                break;
+            case 'H':
+                for (var ii = 1; ii <= np; ii++) {
+                    polydeg.push(1);
+                    i1 = ii - 1;
+                    polyCP.push({'x': polytemp[i1], 'y': polyCP[nCP - 1].y});
+                    nCP++;
+                    gccont[numeroSegmenti] = 0;
+                    numeroSegmenti++;
+                }
 //                    polydeg.push(1);
 //                    polyCP.push({'x':polytemp[0], 'y':polyCP[nCP-1].y});
 //                    nCP++;
 //                    numeroSegmenti++;
 //console.log("H");
-                    break;
-                case 'h':
-                    for (var ii=1; ii<=np; ii++){
-                        polydeg.push(1);
-                        i1=ii-1;
-                        polytemp[i1]+=ipoint[0];
-                        ipoint[0]=polytemp[i1];
-                        ipoint[1]=polyCP[nCP-1].y;
-                        polyCP.push({'x':polytemp[i1], 'y':polyCP[nCP-1].y});
-                        nCP++;
-                        gccont[numeroSegmenti]=0;
-                        numeroSegmenti++;
-                    }
-                    break;
-                case 'V':
-                    for (var ii=1; ii<=np; ii++){
-                        polydeg.push(1);
-                        i1=ii-1;
-                        polyCP.push({'x':polyCP[nCP-1].x, 'y':polytemp[i1]});
-                        nCP++;
-                        gccont[numeroSegmenti]=0;
-                        numeroSegmenti++;
-                    }
+                break;
+            case 'h':
+                for (var ii = 1; ii <= np; ii++) {
+                    polydeg.push(1);
+                    i1 = ii - 1;
+                    polytemp[i1] += ipoint[0];
+                    ipoint[0] = polytemp[i1];
+                    ipoint[1] = polyCP[nCP - 1].y;
+                    polyCP.push({'x': polytemp[i1], 'y': polyCP[nCP - 1].y});
+                    nCP++;
+                    gccont[numeroSegmenti] = 0;
+                    numeroSegmenti++;
+                }
+                break;
+            case 'V':
+                for (var ii = 1; ii <= np; ii++) {
+                    polydeg.push(1);
+                    i1 = ii - 1;
+                    polyCP.push({'x': polyCP[nCP - 1].x, 'y': polytemp[i1]});
+                    nCP++;
+                    gccont[numeroSegmenti] = 0;
+                    numeroSegmenti++;
+                }
 //console.log("V");
-                    break;
-                case 'v':
-                    for (var ii=1; ii<=np; ii++){
-                        polydeg.push(1);
-                        i1=ii-1;
-                        polytemp[i1]+=ipoint[1];
-                        ipoint[0]=polyCP[nCP-1].x;
-                        ipoint[1]=polytemp[i1];
-                        polyCP.push({'x':polyCP[nCP-1].x, 'y':polytemp[i1]});
-                        nCP++;
-                        gccont[numeroSegmenti]=0;
-                        numeroSegmenti++;
-                    }
-                    break;
-                case 'C':
-                    for (var ii=1; ii<=np/6; ii++){
-                        polydeg.push(3);
-                        i1=6*(ii-1);
-                        polyCP.push({'x':polytemp[i1], 'y':polytemp[++i1]});
-                        nCP++;
-                        polyCP.push({'x':polytemp[++i1], 'y':polytemp[++i1]});
-                        nCP++;
-                        polyCP.push({'x':polytemp[++i1], 'y':polytemp[++i1]});
-                        nCP++;
-                        gccont[numeroSegmenti]=0;
-                        numeroSegmenti++;
-                    }
-                    break;
-                case 'c':
-                    for (var ii=1; ii<=np/6; ii++){
-                        polydeg.push(3);
-                        i1=6*(ii-1);
-                        polytemp[i1]+=ipoint[0];
-                        polytemp[i1+1]+=ipoint[1];
-                        polyCP.push({'x':polytemp[i1], 'y':polytemp[++i1]});
-                        nCP++;
-                        polytemp[++i1]+=ipoint[0];
-                        polytemp[i1+1]+=ipoint[1];
-                        polyCP.push({'x':polytemp[i1], 'y':polytemp[++i1]});
-                        nCP++;
-                        polytemp[++i1]+=ipoint[0];
-                        polytemp[i1+1]+=ipoint[1];
-                        ipoint[0]=polytemp[i1];
-                        ipoint[1]=polytemp[i1+1];
-                        polyCP.push({'x':polytemp[i1], 'y':polytemp[++i1]});
-                        nCP++;
-                        gccont[numeroSegmenti]=0;
-                        numeroSegmenti++;
-                    }
-                    break;
-                case 'S':
-                    for (var ii=1; ii<=np/4; ii++){
-                        polydeg.push(3);
+                break;
+            case 'v':
+                for (var ii = 1; ii <= np; ii++) {
+                    polydeg.push(1);
+                    i1 = ii - 1;
+                    polytemp[i1] += ipoint[1];
+                    ipoint[0] = polyCP[nCP - 1].x;
+                    ipoint[1] = polytemp[i1];
+                    polyCP.push({'x': polyCP[nCP - 1].x, 'y': polytemp[i1]});
+                    nCP++;
+                    gccont[numeroSegmenti] = 0;
+                    numeroSegmenti++;
+                }
+                break;
+            case 'C':
+                for (var ii = 1; ii <= np / 6; ii++) {
+                    polydeg.push(3);
+                    i1 = 6 * (ii - 1);
+                    polyCP.push({'x': polytemp[i1], 'y': polytemp[++i1]});
+                    nCP++;
+                    polyCP.push({'x': polytemp[++i1], 'y': polytemp[++i1]});
+                    nCP++;
+                    polyCP.push({'x': polytemp[++i1], 'y': polytemp[++i1]});
+                    nCP++;
+                    gccont[numeroSegmenti] = 0;
+                    numeroSegmenti++;
+                }
+                break;
+            case 'c':
+                for (var ii = 1; ii <= np / 6; ii++) {
+                    polydeg.push(3);
+                    i1 = 6 * (ii - 1);
+                    polytemp[i1] += ipoint[0];
+                    polytemp[i1 + 1] += ipoint[1];
+                    polyCP.push({'x': polytemp[i1], 'y': polytemp[++i1]});
+                    nCP++;
+                    polytemp[++i1] += ipoint[0];
+                    polytemp[i1 + 1] += ipoint[1];
+                    polyCP.push({'x': polytemp[i1], 'y': polytemp[++i1]});
+                    nCP++;
+                    polytemp[++i1] += ipoint[0];
+                    polytemp[i1 + 1] += ipoint[1];
+                    ipoint[0] = polytemp[i1];
+                    ipoint[1] = polytemp[i1 + 1];
+                    polyCP.push({'x': polytemp[i1], 'y': polytemp[++i1]});
+                    nCP++;
+                    gccont[numeroSegmenti] = 0;
+                    numeroSegmenti++;
+                }
+                break;
+            case 'S':
+                for (var ii = 1; ii <= np / 4; ii++) {
+                    polydeg.push(3);
 //                        polyCP.push({'x':2*polyCP[nCP-1].x-polyCP[nCP-2].x, 'y':2*polyCP[nCP-1].y-polyCP[nCP-2].y});
 //                        nCP++;
-                        polyCP[nCP-1].x=2*polyCP[nCP-1].x-polyCP[nCP-2].x;
-                        polyCP[nCP-1].y=2*polyCP[nCP-1].y-polyCP[nCP-2].y;
-                        i1=4*(ii-1);
-                        polyCP.push({'x':polytemp[i1], 'y':polytemp[++i1]});
-                        nCP++;
-                        polyCP.push({'x':polytemp[++i1], 'y':polytemp[++i1]});
-                        nCP++;
-                        gccont[numeroSegmenti]=1;
-                        numeroSegmenti++;
-                    }
-                    break;
-                case 's':
-                    for (var ii=1; ii<=np/4; ii++){
-                        polydeg.push(3);
+                    polyCP[nCP - 1].x = 2 * polyCP[nCP - 1].x - polyCP[nCP - 2].x;
+                    polyCP[nCP - 1].y = 2 * polyCP[nCP - 1].y - polyCP[nCP - 2].y;
+                    i1 = 4 * (ii - 1);
+                    polyCP.push({'x': polytemp[i1], 'y': polytemp[++i1]});
+                    nCP++;
+                    polyCP.push({'x': polytemp[++i1], 'y': polytemp[++i1]});
+                    nCP++;
+                    gccont[numeroSegmenti] = 1;
+                    numeroSegmenti++;
+                }
+                break;
+            case 's':
+                for (var ii = 1; ii <= np / 4; ii++) {
+                    polydeg.push(3);
 //                        polyCP.push({'x':2*polyCP[nCP-1].x-polyCP[nCP-2].x, 'y':2*polyCP[nCP-1].y-polyCP[nCP-2].y});
 //                        nCP++;
-                        polyCP[nCP-1].x=2*polyCP[nCP-1].x-polyCP[nCP-2].x;
-                        polyCP[nCP-1].y=2*polyCP[nCP-1].y-polyCP[nCP-2].y;
-                        i1=4*(ii-1);
-                        polytemp[i1]+=ipoint[0];
-                        polytemp[i1+1]+=ipoint[1];
-                        polyCP.push({'x':polytemp[i1], 'y':polytemp[++i1]});
-                        nCP++;
-                        polytemp[++i1]+=ipoint[0];
-                        polytemp[i1+1]+=ipoint[1];
-                        ipoint[0]=polytemp[i1];
-                        ipoint[1]=polytemp[i1+1];
-                        polyCP.push({'x':polytemp[i1], 'y':polytemp[++i1]});
-                        nCP++;
-                        gccont[numeroSegmenti]=1;
-                        numeroSegmenti++;
-                    }
-                    break;
-                case 'Q':
-                    for (var ii=1; ii<=np/4; ii++){
-                        polydeg.push(2);
-                        i1=4*(ii-1);
-                        polyCP.push({'x':polytemp[i1], 'y':polytemp[++i1]});
-                        nCP++;
-                        polyCP.push({'x':polytemp[++i1], 'y':polytemp[++i1]});
-                        nCP++;
-                        gccont[numeroSegmenti]=0;
-                        numeroSegmenti++;
-                    }
+                    polyCP[nCP - 1].x = 2 * polyCP[nCP - 1].x - polyCP[nCP - 2].x;
+                    polyCP[nCP - 1].y = 2 * polyCP[nCP - 1].y - polyCP[nCP - 2].y;
+                    i1 = 4 * (ii - 1);
+                    polytemp[i1] += ipoint[0];
+                    polytemp[i1 + 1] += ipoint[1];
+                    polyCP.push({'x': polytemp[i1], 'y': polytemp[++i1]});
+                    nCP++;
+                    polytemp[++i1] += ipoint[0];
+                    polytemp[i1 + 1] += ipoint[1];
+                    ipoint[0] = polytemp[i1];
+                    ipoint[1] = polytemp[i1 + 1];
+                    polyCP.push({'x': polytemp[i1], 'y': polytemp[++i1]});
+                    nCP++;
+                    gccont[numeroSegmenti] = 1;
+                    numeroSegmenti++;
+                }
+                break;
+            case 'Q':
+                for (var ii = 1; ii <= np / 4; ii++) {
+                    polydeg.push(2);
+                    i1 = 4 * (ii - 1);
+                    polyCP.push({'x': polytemp[i1], 'y': polytemp[++i1]});
+                    nCP++;
+                    polyCP.push({'x': polytemp[++i1], 'y': polytemp[++i1]});
+                    nCP++;
+                    gccont[numeroSegmenti] = 0;
+                    numeroSegmenti++;
+                }
 //console.log("Q");
-                    break;
-                case 'q':
-                    for (var ii=1; ii<=np/4; ii++){
-                        polydeg.push(2);
-                        i1=4*(ii-1);
-                        polytemp[i1]+=ipoint[0];
-                        polytemp[i1+1]+=ipoint[1];
-                        polyCP.push({'x':polytemp[i1], 'y':polytemp[++i1]});
-                        nCP++;
-                        polytemp[++i1]+=ipoint[0];
-                        polytemp[i1+1]+=ipoint[1];
-                        ipoint[0]=polytemp[i1];
-                        ipoint[1]=polytemp[i1+1];
-                        polyCP.push({'x':polytemp[i1], 'y':polytemp[++i1]});
-                        nCP++;
-                        gccont[numeroSegmenti]=0;
-                        numeroSegmenti++;
-                    }
-                    break;
-                case 'T':
-                    for (var ii=1; ii<=np/2; ii++){
-                        polydeg.push(2);
+                break;
+            case 'q':
+                for (var ii = 1; ii <= np / 4; ii++) {
+                    polydeg.push(2);
+                    i1 = 4 * (ii - 1);
+                    polytemp[i1] += ipoint[0];
+                    polytemp[i1 + 1] += ipoint[1];
+                    polyCP.push({'x': polytemp[i1], 'y': polytemp[++i1]});
+                    nCP++;
+                    polytemp[++i1] += ipoint[0];
+                    polytemp[i1 + 1] += ipoint[1];
+                    ipoint[0] = polytemp[i1];
+                    ipoint[1] = polytemp[i1 + 1];
+                    polyCP.push({'x': polytemp[i1], 'y': polytemp[++i1]});
+                    nCP++;
+                    gccont[numeroSegmenti] = 0;
+                    numeroSegmenti++;
+                }
+                break;
+            case 'T':
+                for (var ii = 1; ii <= np / 2; ii++) {
+                    polydeg.push(2);
 //                        polyCP.push({'x':2*polyCP[nCP-1].x-polyCP[nCP-2].x, 'y':2*polyCP[nCP-1].y-polyCP[nCP-2].y});
 //                        nCP++;
-                        polyCP[nCP-1].x=2*polyCP[nCP-1].x-polyCP[nCP-2].x;
-                        polyCP[nCP-1].y=2*polyCP[nCP-1].y-polyCP[nCP-2].y;
-                        i1=2*(ii-1);
-                        polyCP.push({'x':polytemp[i1], 'y':polytemp[++i1]});
-                        nCP++;
-                        gccont[numeroSegmenti]=1;
-                        numeroSegmenti++;
-                    }
+                    polyCP[nCP - 1].x = 2 * polyCP[nCP - 1].x - polyCP[nCP - 2].x;
+                    polyCP[nCP - 1].y = 2 * polyCP[nCP - 1].y - polyCP[nCP - 2].y;
+                    i1 = 2 * (ii - 1);
+                    polyCP.push({'x': polytemp[i1], 'y': polytemp[++i1]});
+                    nCP++;
+                    gccont[numeroSegmenti] = 1;
+                    numeroSegmenti++;
+                }
 //console.log("T");
-                    break;
-                case 't':
-                    for (var ii=1; ii<=np/2; ii++){
-                        polydeg.push(2);
+                break;
+            case 't':
+                for (var ii = 1; ii <= np / 2; ii++) {
+                    polydeg.push(2);
 //                        polyCP.push({'x':2*polyCP[nCP-1].x-polyCP[nCP-2].x, 'y':2*polyCP[nCP-1].y-polyCP[nCP-2].y});
 //                        nCP++;
-                        polyCP[nCP-1].x=2*polyCP[nCP-1].x-polyCP[nCP-2].x;
-                        polyCP[nCP-1].y=2*polyCP[nCP-1].y-polyCP[nCP-2].y;
-                        i1=2*(ii-1);
-                        polytemp[i1]+=ipoint[0];
-                        polytemp[i1+1]+=ipoint[1];
-                        ipoint[0]=polytemp[i1];
-                        ipoint[1]=polytemp[i1+1];
-                        polyCP.push({'x':polytemp[i1], 'y':polytemp[++i1]});
-                        nCP++;
-                        gccont[numeroSegmenti]=1;
-                        numeroSegmenti++;
-                    }
-                    break;
-                case 'A':
+                    polyCP[nCP - 1].x = 2 * polyCP[nCP - 1].x - polyCP[nCP - 2].x;
+                    polyCP[nCP - 1].y = 2 * polyCP[nCP - 1].y - polyCP[nCP - 2].y;
+                    i1 = 2 * (ii - 1);
+                    polytemp[i1] += ipoint[0];
+                    polytemp[i1 + 1] += ipoint[1];
+                    ipoint[0] = polytemp[i1];
+                    ipoint[1] = polytemp[i1 + 1];
+                    polyCP.push({'x': polytemp[i1], 'y': polytemp[++i1]});
+                    nCP++;
+                    gccont[numeroSegmenti] = 1;
+                    numeroSegmenti++;
+                }
+                break;
+            case 'A':
 //                  polytemp=str2num(polyStr(gcnum(i)+1:gcnum(i+1)-1));
 //                  point=[polytemp(end-1);polytemp(end)];
 //                  pp=SVGEllipticArc(polyCP(1,end),polyCP(2,end),point(1,1),point(2,1),...
 //                      polytemp(1),polytemp(2),polytemp(3),polytemp(4),polytemp(5),20);
 //                  polyCP=[polyCP,point];
-                    break;
-                case 'a':
+                break;
+            case 'a':
 //                  polytemp=str2num(polyStr(gcnum(i)+1:gcnum(i+1)-1));
 //                  point=[polytemp(end-1);polytemp(end)];
 //                  point(1,1)=polyCP(1,end)+polytemp(end-1);
@@ -908,83 +891,55 @@ function path_openFile(event) {
 //                  pp=SVGEllipticArc(polyCP(1,end),polyCP(2,end),point(1,1),point(2,1),...
 //                      polytemp(1),polytemp(2),polytemp(3),polytemp(4),polytemp(5),20);
 //                  polyCP=[polyCP,point];
-                    break;
-                case 'Z':
-                case 'z': //GC 15/11/22 cambiato l'if, prima era =! e non veniva sentito TODO
-                    if(Math.abs(polyCP[0].x-polyCP[nCP-1].x)>0.001 || Math.abs(polyCP[0].y-polyCP[nCP-1].y)>0.001){
-                        polydeg.push(1);
+                break;
+            case 'Z':
+            case 'z': //GC 15/11/22 cambiato l'if, prima era =! e non veniva sentito TODO
+                if (Math.abs(polyCP[0].x - polyCP[nCP - 1].x) > 0.001 || Math.abs(polyCP[0].y - polyCP[nCP - 1].y) > 0.001) {
+                    polydeg.push(1);
 //                        polyCP.push({'x':polyCP[0].x, 'y':polyCP[0].y});
 //                        nCP++;
-                        period=0;
-                        gccont[numeroSegmenti]=0;
-                        numeroSegmenti++;
-                    }
-                    break;
-            }
+                    period = 0;
+                    gccont[numeroSegmenti] = 0;
+                    numeroSegmenti++;
+                }
+                break;
         }
-
-        //GC 15/11/22 per non forzare la periodicità
-        //  if(Math.abs(polyCP[0].x-polyCP[nCP-1].x) < 0.001 && Math.abs(polyCP[0].y-polyCP[nCP-1].y) < 0.001){
-        //     nCP--;
-        //     period=0;
-        //  }
-
-//console.log(polyCP);
-//console.log(nCP);
-//console.log(numeroSegmenti);
-
-        for (var i=0; i<numeroSegmenti; i++)
-            ampiezzaSegmenti[i]=1;
-        paramd.ampiezzaSegmenti = ampiezzaSegmenti;
-        paramd.degree = polydeg;
-
-// console.log("cont",cont);
-// console.log("numeroSegmenti",numeroSegmenti);
-// console.log("continuity",continuity);
-// console.log("continuity",gccont);
-        for (var i=0; i<numeroSegmenti-1; i++){
-            continuity[i]=gccont[i+1];
-        }
-        paramd.continuity = continuity;
-//console.log(polyCP);
-        for (var i=0; i<nCP; i++)
-            controlPoint.push({'x':polyCP[i].x, 'y':polyCP[i].y});
-        //controlPoint = polyCP;
-        var temp = 0;
-        for(var i = 0; i <= numeroSegmenti; i++){
-            temp = _.sum(paramd.ampiezzaSegmenti.slice(0, i));
-            paramd.breakPoint[i] = temp;
-        }
-
-        paramd.estremoA = paramd.breakPoint[0];
-        paramd.estremoB = paramd.breakPoint[i - 1];
-        paramd.indicePrimoBreakPoint = 0;
-        paramd.indiceUltimoBreakPoint = numeroSegmenti;
-
-        paramd = isClosedShape(paramd, period);
-        paramd = partizioniNodali(paramd);
-        paramd.numeroControlPoint = controlPoint.length; //_.sum(param.degree.slice(0,param.numeroSegmenti)-param.continuity.slice(0, param.numeroSegmenti - 1))+param.degree[0] + 1;
-        paramd.numeroBreakPoint = paramd.breakPoint.length - 1;
-
-        initButton = true;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        NUMBER_POINT = Number($('#npoint').val());
-
-        pointGcMeshNew = gc_mesh_new(paramd, NUMBER_POINT);
-        var myStruct = gc_MDbspl_valder(paramd, pointGcMeshNew);
-
-        bs = myStruct.bs;
-        fl = myStruct.fl;
-
-        var Struct = wind_view(controlPoint);
-        controlPoint = _.clone(Struct.controlPoint);
-
-        var period = paramd.continuity[paramd.indicePrimoBreakPoint];
-        pointShape = redraw(bs, fl, controlPoint, pointShape, period);
-        appendInfo(paramd);
     }
-    reader.readAsText(input.files[0]);
+    for (var i = 0; i < numeroSegmenti; i++)
+        ampiezzaSegmenti[i] = 1;
+    paramd.ampiezzaSegmenti = ampiezzaSegmenti;
+    paramd.degree = polydeg;
+    for (var i = 0; i < numeroSegmenti - 1; i++) {
+        continuity[i] = gccont[i + 1];
+    }
+    paramd.continuity = continuity;
+    for (var i = 0; i < nCP; i++)
+        controlPoint.push({'x': polyCP[i].x, 'y': polyCP[i].y});
+    var temp = 0;
+    for (var i = 0; i <= numeroSegmenti; i++) {
+        temp = _.sum(paramd.ampiezzaSegmenti.slice(0, i));
+        paramd.breakPoint[i] = temp;
+    }
+    paramd.estremoA = paramd.breakPoint[0];
+    paramd.estremoB = paramd.breakPoint[i - 1];
+    paramd.indicePrimoBreakPoint = 0;
+    paramd.indiceUltimoBreakPoint = numeroSegmenti;
+    paramd = isClosedShape(paramd, period);
+    paramd = partizioniNodali(paramd);
+    paramd.numeroControlPoint = controlPoint.length;
+    paramd.numeroBreakPoint = paramd.breakPoint.length - 1;
+    initButton = true;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    NUMBER_POINT = Number($('#npoint').val());
+    pointGcMeshNew = gc_mesh_new(paramd, NUMBER_POINT);
+    var myStruct = gc_MDbspl_valder(paramd, pointGcMeshNew);
+    bs = myStruct.bs;
+    fl = myStruct.fl;
+    var Struct = wind_view(controlPoint);
+    controlPoint = _.clone(Struct.controlPoint);
+    var period = paramd.continuity[paramd.indicePrimoBreakPoint];
+    pointShape = redraw(bs, fl, controlPoint, pointShape, period);
+    appendInfo(paramd);
 }
 
 
@@ -1037,61 +992,90 @@ function md_saveFile(event) {
     }
 }
 
+function svg_saveFile(event) {
+    let active = project.active_path;
+    let dataset = []
+    for (let i = 0; i < project.paths.length; i++) {
+        selectPath(project.paths[i].id, false, true)
+        dataset.push(path_saveFile(event))
+    }
+    let svg = project.createSVG(dataset)
+    selectPath(project.paths[active].id, false, true)
+    saveTextAs(svg, "newFile.svg")
+}
+
+function svg_loadFile(event) {
+    project = new Project()
+    let reader = new FileReader()
+    reader.onload = async function () {
+        let text = reader.result;
+        let parser, svgDoc;
+        parser = new DOMParser()
+        svgDoc = await parser.parseFromString(text, "image/svg+xml")
+        let paths = await svgDoc.getElementsByTagName("path")
+        for (let i = 0; i < paths.length; i++) {
+            console.debug(paths[i].attributes["d"].value)
+            addPath()
+            path_openFile(paths[i].attributes["d"].value)
+        }
+        selectPath(0, false, false)
+    }
+    reader.readAsText(event.target.files[0])
+}
+
 function path_saveFile(event) {
     event.preventDefault();
     mirrorX(event)
-    if(inblock) return;
+    if (inblock) return;
 
-    if(initButton){
-        for(var i = paramd.indicePrimoBreakPoint; i < paramd.indiceUltimoBreakPoint ; i++){
-            paramd.ampiezzaSegmenti[i] = paramd.breakPoint[i+1] - paramd.breakPoint[i];
+    if (initButton) {
+        for (var i = paramd.indicePrimoBreakPoint; i < paramd.indiceUltimoBreakPoint; i++) {
+            paramd.ampiezzaSegmenti[i] = paramd.breakPoint[i + 1] - paramd.breakPoint[i];
         }
         var flag;
         var file = '';
         var tt = [];
 
 //controllo che i knot interval siano unitari (partizione uniforme)
-        var i = 0 ;
-        while (i < paramd.ampiezzaSegmenti.length && Math.abs(1 - paramd.ampiezzaSegmenti[i])<0.001){
+        var i = 0;
+        while (i < paramd.ampiezzaSegmenti.length && Math.abs(1 - paramd.ampiezzaSegmenti[i]) < 0.001) {
             i++;
         }
-        if (i != paramd.ampiezzaSegmenti.length){
+        if (i != paramd.ampiezzaSegmenti.length) {
             flag = 0;
             alert("Operation not permitted! It is not an SVG path: non-uniform partition.")
 //        console.log("non e' un path SVG 1");
             return;
-        }
-        else
+        } else
             flag = 1;
 
 //controllo che tutti i tratti siano di grado <= 3
         var i = paramd.indicePrimoBreakPoint;
-        while (i < paramd.indiceUltimoBreakPoint && paramd.degree[i] <= 3){
+        while (i < paramd.indiceUltimoBreakPoint && paramd.degree[i] <= 3) {
             i++;
         }
-        if (i != paramd.indiceUltimoBreakPoint){
+        if (i != paramd.indiceUltimoBreakPoint) {
             flag = 0;
             alert("Operation not permitted! It is not an SVG path: segments of degree greater than 3.")
 //        console.log("non e' un path SVG 2");
             return;
-        }
-        else
+        } else
             flag = 1;
 
 //se i due controlli precedenti sono passati, allora posso salvare la curva come un path SVG
-        if (flag == 1){
+        if (flag == 1) {
 //preparo vettore da inserire (knot-insertion) per rappresentare la curva come C^0
-            var j=0;
-            for(i = paramd.indicePrimoBreakPoint+1; i < paramd.indiceUltimoBreakPoint; i++){
-                for(var ii = 0; ii<paramd.continuity[i]; ii++){
-                    tt[j]=paramd.breakPoint[i];
+            var j = 0;
+            for (i = paramd.indicePrimoBreakPoint + 1; i < paramd.indiceUltimoBreakPoint; i++) {
+                for (var ii = 0; ii < paramd.continuity[i]; ii++) {
+                    tt[j] = paramd.breakPoint[i];
                     j++;
                 }
             }
 //se ci sono dei knot da inserire si entra in questo if
-            if (j > 0){
-                var gc_param = _.cloneDeep(paramd,true);
-                var gc_controlPoint = _.cloneDeep(controlPoint,true);
+            if (j > 0) {
+                var gc_param = _.cloneDeep(paramd, true);
+                var gc_controlPoint = _.cloneDeep(controlPoint, true);
                 var gc_period = paramd.continuity[paramd.indicePrimoBreakPoint];
                 if (gc_period > -1)
                     var gcStruct = num_gc_knotins2d_period(gc_controlPoint, tt, gc_param);
@@ -1099,21 +1083,20 @@ function path_saveFile(event) {
                     var gcStruct = num_gc_knotins2d(gc_controlPoint, tt, gc_param);
 
                 var gcControlPoint = _.clone(gcStruct.controlPoint);
-            }
-            else
-                var gcControlPoint = _.cloneDeep(controlPoint,true);
+            } else
+                var gcControlPoint = _.cloneDeep(controlPoint, true);
 
 //trasformo i CP da coord. viewport a coord. window
             gcControlPoint = view_wind(gcControlPoint);
 // console.log(gcControlPoint.length)
 //li memorizzo in un file secondo la sintassi di un path SVG
-            j=0;
+            j = 0;
             file = "M " + convert(gcControlPoint[j].x.toFixed(DIGIT)) + " " + convert(gcControlPoint[j].y.toFixed(DIGIT));
             j++;
 
             let cmd
 
-            for ( i = paramd.indicePrimoBreakPoint; i < paramd.indiceUltimoBreakPoint; i++){
+            for (i = paramd.indicePrimoBreakPoint; i < paramd.indiceUltimoBreakPoint; i++) {
                 cmd = ""
                 try {
 //console.log(paramd.indicePrimoBreakPoint, i, paramd.degree[i]);
@@ -1177,14 +1160,12 @@ function path_saveFile(event) {
                             break;
                     }
                     file += cmd;
-                }
-                catch (e) {
+                } catch (e) {
                     continue
                 }
             }
-
-            saveTextAs(file, "newFile.path");
             mirrorX(event)
+            return file;
         }
     }
 }
@@ -1264,9 +1245,8 @@ $("canvas").mousewheel(function (ev, val) {
     if (initButton) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         let active = project.active_path;
-        for(let i=0; i<project.paths.length; i++)
-        {
-            if(!transform_multilayer && project.paths[i].id!==project.paths[active].id){
+        for (let i = 0; i < project.paths.length; i++) {
+            if (!transform_multilayer && project.paths[i].id !== project.paths[active].id) {
                 continue;
             }
             selectPath(project.paths[i].id, false, true)
@@ -1274,10 +1254,9 @@ $("canvas").mousewheel(function (ev, val) {
         }
         var period = paramd.continuity[paramd.indicePrimoBreakPoint];
         selectPath(project.paths[active].id, false, true)
-        if(renderList.length!==0){
+        if (renderList.length !== 0) {
             multipleRender()
-        }
-        else{
+        } else {
             redraw1(pointShape, controlPoint, period, false);
         }
     }
@@ -1311,13 +1290,13 @@ function gridfun(event) {
     create_grid(gridx, gridy);
     if (initButton) {
         redraw6(pointShape, controlPoint, paramd.continuity[paramd.indicePrimoBreakPoint]);
-        if(renderList.length!==0){
+        if (renderList.length !== 0) {
             multipleRender()
         }
     }
 }
 
-function zoom(event, dontclear=false) {
+function zoom(event, dontclear = false) {
     if (inblock) return;
 
     if (initButton) {
@@ -1346,8 +1325,8 @@ function zoomArea(event) {
 function zoom_selection() {
     let vratio = (zoomBox.y.end - zoomBox.y.start) / canvas.height
     let active = project.active_path
-    for(let i=0; i<project.paths.length; i++){
-        if(!transform_multilayer && project.paths[i].id!==project.paths[active].id){
+    for (let i = 0; i < project.paths.length; i++) {
+        if (!transform_multilayer && project.paths[i].id !== project.paths[active].id) {
             continue;
         }
         selectPath(project.paths[i].id, false, true)
@@ -1445,7 +1424,7 @@ function drawMDBS(event) {
     }
 }
 
-function drawOnlyCurve(event, clear=true) {
+function drawOnlyCurve(event, clear = true) {
     event.preventDefault();
     if (inblock) return;
 
@@ -1472,39 +1451,39 @@ function drawInside(event) {
 
 function upapprox(event) {
     event.preventDefault();
-    if(inblock) return;
+    if (inblock) return;
 
-    if(initButton){
+    if (initButton) {
         var param_orig = _.cloneDeep(paramd);
-        param_orig=partizioniNodali(param_orig);
-        var np= 2 * param_orig.partizioneNodaleT.length;
-        var numeroSegmenti=paramd.indiceUltimoBreakPoint-paramd.indicePrimoBreakPoint;
-        var temp = (paramd.estremoB - paramd.estremoA)/numeroSegmenti;
-        for (var i=0; i<numeroSegmenti; i++)
-            paramd.ampiezzaSegmenti[i]=temp;
+        param_orig = partizioniNodali(param_orig);
+        var np = 2 * param_orig.partizioneNodaleT.length;
+        var numeroSegmenti = paramd.indiceUltimoBreakPoint - paramd.indicePrimoBreakPoint;
+        var temp = (paramd.estremoB - paramd.estremoA) / numeroSegmenti;
+        for (var i = 0; i < numeroSegmenti; i++)
+            paramd.ampiezzaSegmenti[i] = temp;
         temp = 0;
-        for(i = 0; i <= numeroSegmenti; i++){
+        for (i = 0; i <= numeroSegmenti; i++) {
             temp = _.sum(paramd.ampiezzaSegmenti.slice(0, i));
             paramd.breakPoint[i] = temp;
         }
-        var myStruct =num_gc_approx2d(controlPoint,pointShape,param_orig,paramd,np);
+        var myStruct = num_gc_approx2d(controlPoint, pointShape, param_orig, paramd, np);
         paramd = _.cloneDeep(myStruct.param);
         var cpx = myStruct.cpx;
         var cpy = myStruct.cpy;
-        for(i = 0; i < cpx.length; i++){
-            controlPoint[i] = {x:cpx[i] , y:cpy[i]};
+        for (i = 0; i < cpx.length; i++) {
+            controlPoint[i] = {x: cpx[i], y: cpy[i]};
         }
 
 //GC 11/08/2021
 //aggiunte per rendere partizione nodale con intervalli unnitari
 //e poter salvare la curva come SVG
         temp = 1.0;
-        paramd.estremoA=0;
-        paramd.estremoB=numeroSegmenti;
-        for (var i=0; i<numeroSegmenti; i++)
-            paramd.ampiezzaSegmenti[i]=temp;
+        paramd.estremoA = 0;
+        paramd.estremoB = numeroSegmenti;
+        for (var i = 0; i < numeroSegmenti; i++)
+            paramd.ampiezzaSegmenti[i] = temp;
         temp = 0;
-        for(i = 0; i <= numeroSegmenti; i++){
+        for (i = 0; i <= numeroSegmenti; i++) {
             temp = _.sum(paramd.ampiezzaSegmenti.slice(0, i));
             paramd.breakPoint[i] = temp;
         }
@@ -1545,8 +1524,8 @@ function rotate(event) {
     if (initButton) {
 //Ruota di 90 gradi in senso antiorario i CP rispetto al proprio baricentro e ridisegna
         let active = project.active_path;
-        for(let k=0; k<project.paths.length; k++) {
-            if(!transform_multilayer && project.paths[k].id!==project.paths[active].id){
+        for (let k = 0; k < project.paths.length; k++) {
+            if (!transform_multilayer && project.paths[k].id !== project.paths[active].id) {
                 continue;
             }
             selectPath(project.paths[k].id, false, true)
@@ -1573,10 +1552,9 @@ function rotate(event) {
             pointShape = redraw(bs, fl, controlPoint, pointShape, period);
         }
         selectPath(project.paths[active].id, false, true)
-        if(renderList.length!==0){
+        if (renderList.length !== 0) {
             multipleRender()
-        }
-        else{
+        } else {
             redraw1(pointShape, controlPoint, period, false);
         }
     }
@@ -1589,8 +1567,8 @@ function mirrorX(event) {
     if (initButton) {
 //Determina i CP simmetrici rispetto all'asse X per il proprio baricentro e ridisegna
         let active = project.active_path;
-        for(let k=0; k<project.paths.length; k++) {
-            if(!transform_multilayer && project.paths[k].id!==project.paths[active].id){
+        for (let k = 0; k < project.paths.length; k++) {
+            if (!transform_multilayer && project.paths[k].id !== project.paths[active].id) {
                 continue;
             }
             selectPath(project.paths[k].id, false, true)
@@ -1612,10 +1590,9 @@ function mirrorX(event) {
             pointShape = redraw(bs, fl, controlPoint, pointShape, period);
         }
         selectPath(project.paths[active].id, false, true)
-        if(renderList.length!==0){
+        if (renderList.length !== 0) {
             multipleRender()
-        }
-        else{
+        } else {
             redraw1(pointShape, controlPoint, period, false);
         }
     }
@@ -1628,8 +1605,8 @@ function mirrorY(event) {
     if (initButton) {
 //Determina i CP simmetrici rispetto all'asse Y per il proprio baricentro e ridisegna
         let active = project.active_path;
-        for(let k=0; k<project.paths.length; k++){
-            if(!transform_multilayer && project.paths[k].id!==project.paths[active].id){
+        for (let k = 0; k < project.paths.length; k++) {
+            if (!transform_multilayer && project.paths[k].id !== project.paths[active].id) {
                 continue;
             }
             selectPath(project.paths[k].id, false, true)
@@ -1651,10 +1628,9 @@ function mirrorY(event) {
             pointShape = redraw(bs, fl, controlPoint, pointShape, period);
         }
         selectPath(project.paths[active].id, false, true)
-        if(renderList.length!==0){
+        if (renderList.length !== 0) {
             multipleRender()
-        }
-        else{
+        } else {
             redraw1(pointShape, controlPoint, period, false);
         }
     }
@@ -1662,33 +1638,33 @@ function mirrorY(event) {
 
 function periodToNoperiod(event) {
     event.preventDefault();
-    if(inblock) return;
+    if (inblock) return;
 
-    if(initButton){
+    if (initButton) {
         var period = paramd.continuity[paramd.indicePrimoBreakPoint];
-        if (period > 0){
+        if (period > 0) {
             var temp = [];
-            var nc=paramd.continuity[paramd.indicePrimoBreakPoint];
-            for (var i=0; i<nc; i++)
+            var nc = paramd.continuity[paramd.indicePrimoBreakPoint];
+            for (var i = 0; i < nc; i++)
                 temp.push(paramd.estremoA);
-            nc=paramd.continuity[paramd.indiceUltimoBreakPoint];
-            for (var i=0; i<nc; i++)
+            nc = paramd.continuity[paramd.indiceUltimoBreakPoint];
+            for (var i = 0; i < nc; i++)
                 temp.push(paramd.estremoB);
 
             var gg = period + 1;
-            for(var i = 0; i < gg; i++)
+            for (var i = 0; i < gg; i++)
                 controlPoint.push(controlPoint[i]);
             var myStruct = num_gc_knotins2d(controlPoint, temp, paramd);
         }
         param = _.cloneDeep(myStruct.param);
         controlPoint = _.clone(myStruct.controlPoint);
 
-        if (period > -1){
+        if (period > -1) {
             period = param.continuity[param.indicePrimoBreakPoint];
-            controlPoint=reduce_controlpoint(controlPoint,period);
+            controlPoint = reduce_controlpoint(controlPoint, period);
         }
 
-        var DrStruct = compute_MDspline(controlPoint,pointShape,pointGcMeshNew,param);
+        var DrStruct = compute_MDspline(controlPoint, pointShape, pointGcMeshNew, param);
         bs = _.clone(DrStruct.bs);
         fl = _.clone(DrStruct.fl);
         paramd = _.cloneDeep(param);
@@ -1704,26 +1680,26 @@ function periodToNoperiod(event) {
 //questa nuova function permette di aprire una curva chiusa C^0
 function OpenCurve(event) {
     event.preventDefault();
-    if(inblock) return;
+    if (inblock) return;
 
-    if(initButton){
+    if (initButton) {
         var period = paramd.continuity[paramd.indicePrimoBreakPoint];
-        if (period === 0){
+        if (period === 0) {
             paramd.breakPoint.shift();
             paramd.breakPoint.pop();
             paramd.degree.shift();
             paramd.degree.pop();
             paramd.continuity.shift();
             paramd.continuity.pop();
-            paramd.continuity[0]=-1;
-            paramd.continuity[paramd.breakPoint.length-1]=-1;
-            paramd.indicePrimoBreakPoint-=1;
-            paramd.indiceUltimoBreakPoint-=1;
+            paramd.continuity[0] = -1;
+            paramd.continuity[paramd.breakPoint.length - 1] = -1;
+            paramd.indicePrimoBreakPoint -= 1;
+            paramd.indiceUltimoBreakPoint -= 1;
 
             paramd.numeroBreakPoint = paramd.breakPoint.length;
             let cPl = controlPoint.length;
-            controlPoint.push({'x':controlPoint[0].x, 'y':controlPoint[0].y});
-            paramd.numeroControlPoint = cPl+1;
+            controlPoint.push({'x': controlPoint[0].x, 'y': controlPoint[0].y});
+            paramd.numeroControlPoint = cPl + 1;
             paramd = partizioniNodali(paramd);
 
             NUMBER_POINT = Number($('#npoint').val());
@@ -1744,29 +1720,29 @@ function OpenCurve(event) {
 //una curva aperta (period=-1) la chiude aggiungendo un tratto lineare
 function CloseCurve(event) {
     event.preventDefault();
-    if(inblock) return;
+    if (inblock) return;
 
-    if(initButton){
+    if (initButton) {
         var period = paramd.continuity[paramd.indicePrimoBreakPoint];
-        if (period === -1){
+        if (period === -1) {
             paramd.breakPoint.unshift(1);
-            paramd.breakPoint[0]=paramd.breakPoint[1]-1;
-            paramd.breakPoint.push(paramd.breakPoint[paramd.breakPoint.length-1]+1);
-            paramd.breakPoint.push(paramd.breakPoint[paramd.breakPoint.length-1]+1);
+            paramd.breakPoint[0] = paramd.breakPoint[1] - 1;
+            paramd.breakPoint.push(paramd.breakPoint[paramd.breakPoint.length - 1] + 1);
+            paramd.breakPoint.push(paramd.breakPoint[paramd.breakPoint.length - 1] + 1);
             paramd.degree.unshift(1);
-            paramd.degree[0]=1;
+            paramd.degree[0] = 1;
             paramd.degree.push(1);
             paramd.degree.push(paramd.degree[1]);
             paramd.continuity.unshift(1);
-            paramd.continuity[0]=0;
-            paramd.continuity[1]=0;
+            paramd.continuity[0] = 0;
+            paramd.continuity[1] = 0;
             paramd.continuity.push(0);
-            paramd.continuity[paramd.continuity.length-2]=0;
+            paramd.continuity[paramd.continuity.length - 2] = 0;
             paramd.continuity.push(0);
 
-            paramd.indicePrimoBreakPoint=1;
-            paramd.indiceUltimoBreakPoint+=2;
-            paramd.estremoB=paramd.breakPoint[paramd.breakPoint.length-2];
+            paramd.indicePrimoBreakPoint = 1;
+            paramd.indiceUltimoBreakPoint += 2;
+            paramd.estremoB = paramd.breakPoint[paramd.breakPoint.length - 2];
 
             paramd.numeroBreakPoint = paramd.breakPoint.length;
             paramd = partizioniNodali(paramd);
@@ -1787,7 +1763,7 @@ function CloseCurve(event) {
     }
 }
 
-function showInfoToggle(){
+function showInfoToggle() {
     let panel = document.getElementById("infoShape")
     if (panel.style.display === "none") {
         panel.style.display = "block";
