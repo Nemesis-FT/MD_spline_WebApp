@@ -90,9 +90,11 @@ class Project{
             return svg;
         } else {
             let serializer = new XMLSerializer()
+            let paths
+            let svg_tag
             if(this.svg_source!==null){
-                let paths = await this.svg_source.getElementsByTagName("path")
-                let svg_tag = await this.svg_source.getElementsByTagName("svg")[0]
+                paths = await this.svg_source.getElementsByTagName("path")
+                svg_tag = await this.svg_source.getElementsByTagName("svg")[0]
             }
 
             for(let i=0; i<this.paths.length;i++){
