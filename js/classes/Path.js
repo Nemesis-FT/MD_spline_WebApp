@@ -1,5 +1,5 @@
 class Path{
-    constructor(id) {
+    constructor(id, svgSource = null) {
         this.paramd = {
             degree: [],
             continuity: [],
@@ -22,6 +22,7 @@ class Path{
         this.id = id
         this.fl = []
         this.bs = []
+        this.svgSource = svgSource
     }
 
     getParamd(){

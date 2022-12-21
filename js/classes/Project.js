@@ -3,10 +3,15 @@ class Project{
         this.paths = []
         this.active_path = null
         this.id = 0;
+        this.svg_source = null;
     }
 
-    addPath(){
-        this.paths.push(new Path(this.id))
+    setSvgSource(source){
+        this.svg_source=source;
+    }
+
+    addPath(svgSource = null){
+        this.paths.push(new Path(this.id, svgSource))
         this.id++;
     }
 
@@ -75,12 +80,48 @@ class Project{
         current.innerText = "Current path is #"+(id).toString();
     }
 
-    createSVG(paths_dataset){
-        let svg = "<svg xmlns=\"http://www.w3.org/2000/svg\">\n"
-        for(let i = 0; i<paths_dataset.length; i++){
-            svg += "<path d=\""+ paths_dataset[i]+"\"/>\n"
+    async createSVG(paths_dataset) {
+        if (this.svg_source === null) {
+            let svg = "<svg xmlns=\"http://www.w3.org/2000/svg\">\n"
+            for (let i = 0; i < paths_dataset.length; i++) {
+                svg += "<path d=\"" + paths_dataset[i] + "\"/>\n"
+            }
+            svg += "</svg>\n"
+            return svg;
+        } else {
+            let serializer = new XMLSerializer()
+            if(this.svg_source!==null){
+                let paths = await this.svg_source.getElementsByTagName("path")
+                let svg_tag = await this.svg_source.getElementsByTagName("svg")[0]
+            }
+
+            for(let i=0; i<this.paths.length;i++){
+                if(this.svg_source!==null && this.paths[i].svgSource!==null){
+                    let p = await this.svg_source.getElementById(this.paths[i].svgSource.id)
+                    if(p===null){
+                        for(let k=0; k<paths.length; k++){
+                            if(this.paths[i].svgSource === paths[k]){
+                                p = paths[k]
+                                break;
+                            }
+                        }
+                        if(p===null){
+                            continue
+                        }
+                    }
+                    p.attributes["d"].value = paths_dataset[i]
+                }
+                else{
+                    let p = this.svg_source.createElement("path")
+                    p.id = Math.floor(Date.now() / 1000) + this.paths[i].id
+                    p.setAttribute("d", paths_dataset[i])
+                    svg_tag.appendChild(p)
+                }
+
+            }
+            console.debug("Dopo", serializer.serializeToString(this.svg_source))
+            return serializer.serializeToString(this.svg_source)
         }
-        svg+="</svg>\n"
-        return svg;
+
     }
 }

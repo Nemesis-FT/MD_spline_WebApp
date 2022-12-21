@@ -75,6 +75,7 @@ function appendInfo(myparam){
 function convert(value){
     var lunghezza = value.length;
     var result = '';
+    value = value.toString()
 
     while( value[lunghezza - 1] !== '.' ){
         if(value[lunghezza - 1] !== '0'){

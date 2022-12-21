@@ -151,8 +151,8 @@ canvas.oncontextmenu = function (e) {
 
 }
 
-function addPath() {
-    project.addPath()
+function addPath(svg_data=null) {
+    project.addPath(svg_data)
     initButton = false;
     project.createPathHtml("pathList")
     selectPath(project.id - 1)
@@ -992,14 +992,14 @@ function md_saveFile(event) {
     }
 }
 
-function svg_saveFile(event) {
+async function svg_saveFile(event) {
     let active = project.active_path;
     let dataset = []
     for (let i = 0; i < project.paths.length; i++) {
         selectPath(project.paths[i].id, false, true)
         dataset.push(path_saveFile(event))
     }
-    let svg = project.createSVG(dataset)
+    let svg = await project.createSVG(dataset)
     selectPath(project.paths[active].id, false, true)
     saveTextAs(svg, "newFile.svg")
 }
@@ -1012,20 +1012,22 @@ function svg_loadFile(event) {
         let parser, svgDoc;
         parser = new DOMParser()
         svgDoc = await parser.parseFromString(text, "image/svg+xml")
+        project.setSvgSource(svgDoc)
         let paths = await svgDoc.getElementsByTagName("path")
         for (let i = 0; i < paths.length; i++) {
             console.debug(paths[i].attributes["d"].value)
-            addPath()
+            addPath(paths[i])
             path_openFile(paths[i].attributes["d"].value)
         }
         selectPath(0, false, false)
+        zoom(event)
     }
     reader.readAsText(event.target.files[0])
 }
 
 function path_saveFile(event) {
     event.preventDefault();
-    mirrorX(event)
+    let scale = 1
     if (inblock) return;
 
     if (initButton) {
@@ -1102,58 +1104,58 @@ function path_saveFile(event) {
 //console.log(paramd.indicePrimoBreakPoint, i, paramd.degree[i]);
                     switch (paramd.degree[i]) {
                         case 1:
-                            cmd += " L " + convert(gcControlPoint[j].x.toFixed(DIGIT)) + " " + convert(gcControlPoint[j].y.toFixed(DIGIT));
+                            cmd += " L " + convert(gcControlPoint[j].x.toFixed(DIGIT)*scale) + " " + convert(gcControlPoint[j].y.toFixed(DIGIT)*scale);
                             j++;
                             break;
                         case 2:
                             if (i > paramd.indicePrimoBreakPoint && paramd.degree[i - 1] != 2) {
-                                cmd += " Q " + convert(gcControlPoint[j].x.toFixed(DIGIT)) + " " + convert(gcControlPoint[j].y.toFixed(DIGIT));
+                                cmd += " Q " + convert(gcControlPoint[j].x.toFixed(DIGIT) * scale) + " " + convert(gcControlPoint[j].y.toFixed(DIGIT) * scale);
                                 j++;
-                                cmd += " " + convert(gcControlPoint[j].x.toFixed(DIGIT)) + " " + convert(gcControlPoint[j].y.toFixed(DIGIT));
+                                cmd += " " + convert(gcControlPoint[j].x.toFixed(DIGIT) * scale) + " " + convert(gcControlPoint[j].y.toFixed(DIGIT) * scale);
                                 j++;
                             } else {
                                 if (i > paramd.indicePrimoBreakPoint && paramd.continuity[i] > 0) {
                                     j++;
-                                    cmd += " T " + convert(gcControlPoint[j].x.toFixed(DIGIT)) + " " + convert(gcControlPoint[j].y.toFixed(DIGIT));
+                                    cmd += " T " + convert(gcControlPoint[j].x.toFixed(DIGIT) * scale) + " " + convert(gcControlPoint[j].y.toFixed(DIGIT) * scale);
                                     j++;
                                 } else {
                                     if (i == paramd.indicePrimoBreakPoint)
                                         file += " Q ";
                                     else
                                         cmd += " ";
-                                    cmd += convert(gcControlPoint[j].x.toFixed(DIGIT)) + " " + convert(gcControlPoint[j].y.toFixed(DIGIT));
+                                    cmd += convert(gcControlPoint[j].x.toFixed(DIGIT) * scale) + " " + convert(gcControlPoint[j].y.toFixed(DIGIT) * scale);
                                     j++;
-                                    cmd += " " + convert(gcControlPoint[j].x.toFixed(DIGIT)) + " " + convert(gcControlPoint[j].y.toFixed(DIGIT));
+                                    cmd += " " + convert(gcControlPoint[j].x.toFixed(DIGIT) * scale) + " " + convert(gcControlPoint[j].y.toFixed(DIGIT) * scale);
                                     j++;
                                 }
                             }
                             break;
                         case 3:
                             if (i > paramd.indicePrimoBreakPoint && paramd.degree[i - 1] != 3) {
-                                cmd += " C " + convert(gcControlPoint[j].x.toFixed(DIGIT)) + " " + convert(gcControlPoint[j].y.toFixed(DIGIT));
+                                cmd += " C " + convert(gcControlPoint[j].x.toFixed(DIGIT) * scale) + " " + convert(gcControlPoint[j].y.toFixed(DIGIT) * scale);
                                 j++;
-                                cmd += " " + convert(gcControlPoint[j].x.toFixed(DIGIT)) + " " + convert(gcControlPoint[j].y.toFixed(DIGIT));
+                                cmd += " " + convert(gcControlPoint[j].x.toFixed(DIGIT) * scale) + " " + convert(gcControlPoint[j].y.toFixed(DIGIT) * scale);
                                 j++;
-                                cmd += " " + convert(gcControlPoint[j].x.toFixed(DIGIT)) + " " + convert(gcControlPoint[j].y.toFixed(DIGIT));
+                                cmd += " " + convert(gcControlPoint[j].x.toFixed(DIGIT) * scale) + " " + convert(gcControlPoint[j].y.toFixed(DIGIT) * scale);
                                 j++;
                             } else {
                                 if (i > paramd.indicePrimoBreakPoint && paramd.continuity[i] > 0) {
                                     j++;
-                                    cmd += " S " + convert(gcControlPoint[j].x.toFixed(DIGIT)) + " " + convert(gcControlPoint[j].y.toFixed(DIGIT));
+                                    cmd += " S " + convert(gcControlPoint[j].x.toFixed(DIGIT) * scale) + " " + convert(gcControlPoint[j].y.toFixed(DIGIT) * scale);
                                     j++;
-                                    cmd += " " + convert(gcControlPoint[j].x.toFixed(DIGIT)) + " " + convert(gcControlPoint[j].y.toFixed(DIGIT));
+                                    cmd += " " + convert(gcControlPoint[j].x.toFixed(DIGIT) * scale) + " " + convert(gcControlPoint[j].y.toFixed(DIGIT) * scale);
                                     j++;
                                 } else {
-                                    if (i == paramd.indicePrimoBreakPoint)
+                                    if (i === paramd.indicePrimoBreakPoint)
                                         cmd += " C ";
                                     else
                                         cmd += " ";
 //            console.log(j)
-                                    cmd += convert(gcControlPoint[j].x.toFixed(DIGIT)) + " " + convert(gcControlPoint[j].y.toFixed(DIGIT));
+                                    cmd += convert(gcControlPoint[j].x.toFixed(DIGIT) * scale) + " " + convert(gcControlPoint[j].y.toFixed(DIGIT) * scale);
                                     j++;
-                                    cmd += " " + convert(gcControlPoint[j].x.toFixed(DIGIT)) + " " + convert(gcControlPoint[j].y.toFixed(DIGIT));
+                                    cmd += " " + convert(gcControlPoint[j].x.toFixed(DIGIT) * scale) + " " + convert(gcControlPoint[j].y.toFixed(DIGIT) * scale);
                                     j++;
-                                    cmd += " " + convert(gcControlPoint[j].x.toFixed(DIGIT)) + " " + convert(gcControlPoint[j].y.toFixed(DIGIT));
+                                    cmd += " " + convert(gcControlPoint[j].x.toFixed(DIGIT) * scale) + " " + convert(gcControlPoint[j].y.toFixed(DIGIT) * scale);
                                     j++;
                                 }
                             }
@@ -1161,10 +1163,10 @@ function path_saveFile(event) {
                     }
                     file += cmd;
                 } catch (e) {
+                    console.debug(e)
                     continue
                 }
             }
-            mirrorX(event)
             return file;
         }
     }
@@ -1300,20 +1302,29 @@ function zoom(event, dontclear = false) {
     if (inblock) return;
 
     if (initButton) {
+        let active = project.active_path
         var arrayX = [];
         var arrayY = [];
-        for (var i = 0; i < controlPoint.length; i++) {
-            arrayX.push(controlPoint[i].x);
-            arrayY.push(controlPoint[i].y);
-        }
-        wxmin = _.min(arrayX);
-        wymin = _.min(arrayY);
-        wxmax = _.max(arrayX);
-        wymax = _.max(arrayY);
+        for (let k = 0; k < project.paths.length; k++) {
 
-        zoom_view(pointShape, controlPoint, 0);
-        var period = paramd.continuity[paramd.indicePrimoBreakPoint];
-        redraw1(pointShape, controlPoint, period, !dontclear);
+            selectPath(project.paths[k].id, false, true)
+
+            for (var i = 0; i < controlPoint.length; i++) {
+                arrayX.push(controlPoint[i].x);
+                arrayY.push(controlPoint[i].y);
+            }
+
+
+            wxmin = _.min(arrayX);
+            wymin = _.min(arrayY);
+            wxmax = _.max(arrayX);
+            wymax = _.max(arrayY);
+
+            zoom_view(pointShape, controlPoint, 0);
+            var period = paramd.continuity[paramd.indicePrimoBreakPoint];
+            redraw1(pointShape, controlPoint, period, !dontclear);
+        }
+        selectPath(project.paths[active].id, false, true)
     }
 }
 
