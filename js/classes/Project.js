@@ -115,7 +115,8 @@ class Project{
                         p.attributes["d"].value = paths_dataset[i]
                     }
                     else{
-                        let tmp = this.svg_source.createElement("path")
+                        let tmp = this.svg_source.createElement("path", "http://www.w3.org/2000/svg")
+                        tmp.removeAttribute("xmlns")
                         tmp.setAttribute("d", paths_dataset[i])
                         p.parentElement.appendChild(tmp)
                         p.parentElement.removeChild(p)
@@ -130,7 +131,7 @@ class Project{
 
             }
             console.debug("Dopo", serializer.serializeToString(this.svg_source))
-            return serializer.serializeToString(this.svg_source)
+            return serializer.serializeToString(this.svg_source).replaceAll("xmlns=\"\"", '')
         }
 
     }
