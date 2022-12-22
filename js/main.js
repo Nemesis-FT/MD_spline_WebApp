@@ -1004,6 +1004,24 @@ async function svg_saveFile(event) {
     saveTextAs(svg, "newFile.svg")
 }
 
+function svg_adaptor(path){
+    // Sometimes SVGs are provided in a compressed format, which will not be understood by the parser.
+    // This piece of code however relies on a external library. Not sure if this is allowed.
+    let pathdata = path.getPathData()
+    let d = ""
+    let cmd = ""
+    for(let i=0; i<pathdata.length; i++){
+        cmd += pathdata[i].type + " "
+        for(let k=0; k<pathdata[i].values.length; k++){
+            cmd += pathdata[i].values[k]+" "
+        }
+        d += cmd
+        cmd = ""
+    }
+    console.debug(d)
+    return d;
+}
+
 function svg_loadFile(event) {
     project = new Project()
     let reader = new FileReader()
@@ -1016,11 +1034,13 @@ function svg_loadFile(event) {
         let paths = await svgDoc.getElementsByTagName("path")
         for (let i = 0; i < paths.length; i++) {
             console.debug(paths[i].attributes["d"].value)
+            let path = document.getElementById("pathbuffer")
+            path.setAttribute("d", paths[i].attributes["d"].value)
             addPath(paths[i])
-            path_openFile(paths[i].attributes["d"].value)
+            path_openFile(svg_adaptor(path))
         }
+        calc_wminmax()
         selectPath(0, false, false)
-        zoom(event)
     }
     reader.readAsText(event.target.files[0])
 }
@@ -1298,10 +1318,31 @@ function gridfun(event) {
     }
 }
 
+function calc_wminmax(){
+    var arrayX = [];
+    var arrayY = [];
+    for (let k = 0; k < project.paths.length; k++) {
+
+        selectPath(project.paths[k].id, false, true)
+
+        for (var i = 0; i < controlPoint.length; i++) {
+            arrayX.push(controlPoint[i].x);
+            arrayY.push(controlPoint[i].y);
+        }
+    }
+
+
+    wxmin = _.min(arrayX);
+    wymin = _.min(arrayY);
+    wxmax = _.max(arrayX);
+    wymax = _.max(arrayY);
+}
+
 function zoom(event, dontclear = false) {
     if (inblock) return;
 
     if (initButton) {
+
         let active = project.active_path
         var arrayX = [];
         var arrayY = [];
@@ -1313,13 +1354,16 @@ function zoom(event, dontclear = false) {
                 arrayX.push(controlPoint[i].x);
                 arrayY.push(controlPoint[i].y);
             }
+        }
 
 
-            wxmin = _.min(arrayX);
-            wymin = _.min(arrayY);
-            wxmax = _.max(arrayX);
-            wymax = _.max(arrayY);
+        wxmin = _.min(arrayX);
+        wymin = _.min(arrayY);
+        wxmax = _.max(arrayX);
+        wymax = _.max(arrayY);
 
+        for (let k = 0; k < project.paths.length; k++) {
+            selectPath(project.paths[k].id, false, true)
             zoom_view(pointShape, controlPoint, 0);
             var period = paramd.continuity[paramd.indicePrimoBreakPoint];
             redraw1(pointShape, controlPoint, period, !dontclear);
@@ -1349,7 +1393,7 @@ function zoom_selection() {
 function zoom_view(pointShape, controlPoint, flagwheel, vscale = null) {
 //applica uno zoom ai controlPoint per portarli a pieno schermo/canvas
 //flagwheel e' >0 o <0 a seconda di come sto girando la rotella del mouse
-
+    // Ci sono dei problemi...
     if (flagwheel !== 0) {
         if (flagwheel < 0)
             sc = 1.1;
