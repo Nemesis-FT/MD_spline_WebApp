@@ -1007,19 +1007,25 @@ async function svg_saveFile(event) {
 function svg_adaptor(path){
     // Sometimes SVGs are provided in a compressed format, which will not be understood by the parser.
     // This piece of code however relies on a external library. Not sure if this is allowed.
-    let pathdata = path.getPathData()
-    let d = ""
-    let cmd = ""
-    for(let i=0; i<pathdata.length; i++){
-        cmd += pathdata[i].type + " "
-        for(let k=0; k<pathdata[i].values.length; k++){
-            cmd += pathdata[i].values[k]+" "
+    try{
+        let pathdata = path.getPathData({normalize: true})
+        console.debug(pathdata)
+        let d = ""
+        let cmd = ""
+        for(let i=0; i<pathdata.length; i++){
+            cmd += pathdata[i].type + " "
+            for(let k=0; k<pathdata[i].values.length; k++){
+                cmd += pathdata[i].values[k]+" "
+            }
+            d += cmd
+            cmd = ""
         }
-        d += cmd
-        cmd = ""
+        console.debug(d)
+        return d;
+    } catch (e) {
+        return path.getAttribute("d")
     }
-    console.debug(d)
-    return d;
+
 }
 
 function svg_loadFile(event) {
@@ -1031,11 +1037,10 @@ function svg_loadFile(event) {
         parser = new DOMParser()
         svgDoc = await parser.parseFromString(text, "image/svg+xml")
         project.setSvgSource(svgDoc)
-        let paths = await svgDoc.getElementsByTagName("path")
+        let paths = await svgDoc.querySelectorAll("path, ellipse, rect, circle, line, polyline, polygon")
         for (let i = 0; i < paths.length; i++) {
-            console.debug(paths[i].attributes["d"].value)
             let path = document.getElementById("pathbuffer")
-            path.setAttribute("d", paths[i].attributes["d"].value)
+            path = paths[i]
             addPath(paths[i])
             path_openFile(svg_adaptor(path))
         }

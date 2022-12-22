@@ -93,7 +93,7 @@ class Project{
             let paths
             let svg_tag
             if(this.svg_source!==null){
-                paths = await this.svg_source.getElementsByTagName("path")
+                paths = await this.svg_source.querySelectorAll("path, ellipse, rect, circle, line, polyline, polygon")
                 svg_tag = await this.svg_source.getElementsByTagName("svg")[0]
             }
 
@@ -111,7 +111,15 @@ class Project{
                             continue
                         }
                     }
-                    p.attributes["d"].value = paths_dataset[i]
+                    if(p.tagName==="path"){
+                        p.attributes["d"].value = paths_dataset[i]
+                    }
+                    else{
+                        let tmp = this.svg_source.createElement("path")
+                        tmp.setAttribute("d", paths_dataset[i])
+                        p.parentElement.appendChild(tmp)
+                        p.parentElement.removeChild(p)
+                    }
                 }
                 else{
                     let p = this.svg_source.createElement("path")
