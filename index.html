@@ -44,7 +44,7 @@
                 <button type="button" class="btn btn-light" onclick="drawOnlyCurve(event)">
                     Toggle CPs
                 </button>
-                <button type="button" class="btn btn-light" onclick="drawInside(event)">
+                <button type="button" class="btn btn-light" onclick="toggleFill(event)">
                     FillCurve
                 </button>
                 <button type="button" class="btn btn-primary" onclick="upapprox(event)">
@@ -122,9 +122,18 @@
                         </div>
                     </form>
                 </div>
+                <form>
+                    <div class="form-group">
+                        <label for="strokeCol">Stroke Color</label>
+                        <input type="color" class="form-control mb-2 mr-sm-2 mb-sm-0" id="strokeCol" value="#ff0000" onchange="setStrokeColor(event)">
+                        <label for="fillCol">Fill Color</label>
+                        <input type="color" class="form-control mb-2 mr-sm-2 mb-sm-0" id="fillCol" value="#ffffff" onchange="setFillColor(event)">
+                    </div>
+                </form>
                 <button type="button" class="btn btn-info" onclick="showInfoToggle(event)">
                     Show/Hide Shape info
                 </button>
+
                 <div id="infoShape" style="display: none"></div>
             </div>
         </div>
@@ -269,6 +278,7 @@
     <script type="text/javascript" src="js/utils/utilsDraw/createPoint.js"></script>
     <script type="text/javascript" src="js/utils/utilsDraw/redraw.js"></script>
     <script type="text/javascript" src="js/utils/utilsEvent/eventChange.js"></script>
+    <script type="text/javascript" src="js/utils/colorConverter.js"></script>
     <!--
             <script type="text/javascript" src="js/utils/appendDegreeContinuity.js"></script>
     -->

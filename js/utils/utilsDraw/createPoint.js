@@ -1,6 +1,6 @@
 function createPoint(position, color, period){
 const PCP=7;
-    if(position.length == undefined){ 
+    if(position.length === undefined){
 // se c'e' solo un punto e non un array di punti dobbiamo gestire come 
 // caso particolare
         ctx.beginPath();

@@ -23,6 +23,22 @@ class Path{
         this.fl = []
         this.bs = []
         this.svgSource = svgSource
+        if(!svgSource){
+            return
+        }
+        if(svgSource.getAttribute("stroke")){
+            this.strokeColor = colorConverter(svgSource.getAttribute("stroke"))
+        }
+        else{
+            this.strokeColor = "#000000"
+        }
+        if(svgSource.getAttribute("fill")) {
+            this.fillColor = colorConverter(svgSource.getAttribute("fill"))
+        }
+        else{
+            this.fillColor = "#000000"
+        }
+
     }
 
     getParamd(){
