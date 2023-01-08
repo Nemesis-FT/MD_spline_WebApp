@@ -237,8 +237,15 @@ function setPathRenderList(e) {
         renderList = []
         return;
     }
-    let ids_str = input.value.split(",")
     let ids = []
+    if (input.value === "*"){
+        for(let i=0; i<project.paths.length; i++){
+            ids.push(project.paths[i].id)
+        }
+        renderList = ids
+        return;
+    }
+    let ids_str = input.value.split(",")
     for (let i = 0; i < ids_str.length; i++) {
         try {
             let id = parseInt(ids_str[i])
@@ -260,7 +267,7 @@ function multipleRender() {
     let active_path = project.paths[project.active_path]
     let active = project.active_path
     //ctx.clearRect(0, 0, canvas.width, canvas.height);
-    for (let i = project.paths.length-1; i >= 0 ; i--) {
+    for (let i = 0; i <project.paths.length ; i++) {
         if (renderList.includes(project.paths[i].id)) {
             selectPath(project.paths[i].id, false, true)
             let e = new Event("", undefined);
@@ -290,7 +297,6 @@ function mouseUpFunction(e) {
     if (mode === "draw") {
         if (IDelement !== -1) {
             IDelement = -1;
-            pan = 0;
             return;
         }
 
@@ -437,7 +443,7 @@ function mouseMoveFunction(e) {
             var ipoint = getMousePos(e);
             ipoint = gridPoint(ipoint);
 
-            if (pan == 1) {
+            if (pan) {
                 panning(ipoint)
             } else {
 
@@ -481,7 +487,7 @@ function panfun(event) {
     if (inblock) return;
 
     if (initButton)
-        pan = 1 - pan;
+        pan = !pan;
 }
 
 function md_openFile(event) {
@@ -1007,11 +1013,15 @@ async function svg_saveFile(event) {
     let dataset = []
     for (let i = 0; i < project.paths.length; i++) {
         selectPath(project.paths[i].id, false, true)
+
         dataset.push(path_saveFile(event))
     }
+    let data = calc_wminmax()
+    console.debug(data)
+    project.viewbox = data
     let svg = await project.createSVG(dataset)
     selectPath(project.paths[active].id, false, true)
-    saveTextAs(svg, "newFile.svg")
+    await saveTextAs(svg, "newFile.svg")
 }
 
 function svg_adaptor(path){
@@ -1053,8 +1063,11 @@ function svg_loadFile(event) {
             addPath(paths[i])
             path_openFile(svg_adaptor(path))
         }
-        calc_wminmax()
+        let data = calc_wminmax()
+        console.debug(data)
+        project.viewbox = data
         selectPath(0, false, false)
+        //mirrorX(event)
     }
     reader.readAsText(event.target.files[0])
 }
@@ -1207,6 +1220,9 @@ function path_saveFile(event) {
 }
 
 function wind_view(controlPoint) {
+    return {controlPoint: controlPoint};
+
+    // I've been hunting this bug for days. This function is why everything does not stay in its proper position.
     var arrayX = [];
     var arrayY = [];
     for (var i = 0; i < controlPoint.length; i++) {
@@ -1246,6 +1262,7 @@ function wind_view(controlPoint) {
 function view_wind(myControlPointToSend) {
 //converte i controlPoint da coord. viewport alle coordinate
 //di una window [0,1]x[0,1]
+    return myControlPointToSend
     var arrayX = [];
     var arrayY = [];
     for (var i = 0; i < myControlPointToSend.length; i++) {
@@ -1346,10 +1363,11 @@ function calc_wminmax(){
     }
 
 
-    wxmin = _.min(arrayX);
-    wymin = _.min(arrayY);
-    wxmax = _.max(arrayX);
-    wymax = _.max(arrayY);
+    let wxmin = _.min(arrayX);
+    let wymin = _.min(arrayY);
+    let wxmax = _.max(arrayX);
+    let wymax = _.max(arrayY);
+    return {xmax:wxmax , xmin:wxmin, ymax:wymax, ymin:wymin}
 }
 
 function zoom(event, dontclear = false) {

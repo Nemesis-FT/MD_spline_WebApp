@@ -4,6 +4,7 @@ class Project{
         this.active_path = null
         this.id = 0;
         this.svg_source = null;
+        this.viewbox = {xmax:1, xmin:0, ymax:1, ymin:0}
     }
 
     setSvgSource(source){
@@ -37,7 +38,7 @@ class Project{
     createPathHtml(container_id){
         let container = document.getElementById(container_id)
         container.innerHTML = "";
-        for(let i=0; i<this.paths.length; i++){
+        for(let i=this.paths.length-1; i>=0; i--){
             this.paths[i].createHTML(container)
         }
     }
@@ -82,7 +83,7 @@ class Project{
 
     async createSVG(paths_dataset) {
         if (this.svg_source === null) {
-            let svg = "<svg xmlns=\"http://www.w3.org/2000/svg\">\n"
+            let svg = `<svg xmlns=\"http://www.w3.org/2000/svg\" width="${this.viewbox.xmax}" height="${this.viewbox.ymax}" viewBox="${this.viewbox.xmin} ${this.viewbox.ymin} ${this.viewbox.xmax} ${this.viewbox.ymax}">\n`
             for (let i = 0; i < paths_dataset.length; i++) {
                 svg += "<path d=\"" + paths_dataset[i] + "\" stroke='"+this.paths[i].strokeColor+"' fill='"+this.paths[i].fillColor+"' />\n"
             }
@@ -95,6 +96,9 @@ class Project{
             if(this.svg_source!==null){
                 paths = await this.svg_source.querySelectorAll("path, ellipse, rect, circle, line, polyline, polygon")
                 svg_tag = await this.svg_source.getElementsByTagName("svg")[0]
+                svg_tag.setAttribute("width", this.viewbox.xmax)
+                svg_tag.setAttribute("height", this.viewbox.ymax)
+                svg_tag.setAttribute("viewBox", `${this.viewbox.xmin} ${this.viewbox.ymin} ${this.viewbox.xmax} ${this.viewbox.ymax}`)
             }
 
             for(let i=0; i<this.paths.length;i++){
@@ -136,7 +140,6 @@ class Project{
                 }
 
             }
-            console.debug("Dopo", serializer.serializeToString(this.svg_source))
             return serializer.serializeToString(this.svg_source).replaceAll("xmlns=\"\"", '')
         }
 
