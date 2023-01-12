@@ -18,12 +18,30 @@ var param = {
     indiciPartizioneNodaleS: []
 }
 
-let project = new Project()
+
 
 
 var NUMBER_POINT = Number($('#npoint').val());
 var paramd;
 var canvas = document.getElementById('canvas');
+let project = new Project()
+function resize(){
+    let parent = canvas.parentNode
+    let styles = getComputedStyle(parent)
+    let w=parseInt(styles.getPropertyValue("width"), 10)
+    let h=parseInt(styles.getPropertyValue("height"), 10)
+    canvas.width = w -10
+    canvas.height = h
+    if(project.paths.length === 0){
+        return
+    }
+    redraw6(pointShape, controlPoint, paramd.continuity[paramd.indicePrimoBreakPoint], project.paths[project.active_path].strokeColor, project.paths[project.active_path].fillColor);
+    if (renderList.length !== 0) {
+        multipleRender()
+    }
+}
+$(window).on("resize", resize);
+resize()
 var ctx = canvas.getContext("2d");
 var controlPoint = [];
 var pointShape = [];
@@ -45,7 +63,6 @@ var zoomBox = {x: {start: 0, end: 0}, y: {start: 0, end: 0}}
 var offsets = {x: 0, y: 0}
 let renderList = []
 let transform_multilayer = true
-var gg = 0;
 var gc_col = ["Blue", "Cyan", "Green", "Red", "Yellow", "Magenta", "Black"];
 var gridx = [];
 var gridy = [];
@@ -82,7 +99,7 @@ paramd = _.cloneDeep(project.paths[project.active_path].getParamd());
 //prende in input un punto schermo (coord. viewport) e le
 //trasforma in coordinate della griglia (grid)
 function gridPoint(ipoint) {
-    if (grid_flag == 1) {
+    if (grid_flag === 1) {
         var ix = Math.trunc(0.5 + ipoint.x / hx);
         var iy = Math.trunc(0.5 + ipoint.y / hy);
         ipoint.x = gridx[ix];
@@ -104,7 +121,7 @@ canvas.oncontextmenu = function (e) {
             appendOption(IDpointCurve, paramd);
             IDpointCurve = -1;
         }
-        if (IDelement != -1)
+        if (IDelement !== -1)
             IDelement = -1;
         return;
     } else {
@@ -112,8 +129,6 @@ canvas.oncontextmenu = function (e) {
 //inseriti i CP iniziali e poi terminati con button destro
         initButton = true;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        var isClosed = $('input[name=isClosed]:checked').val();
         paramd = _.cloneDeep(project.paths[project.active_path].getParamd());
         var degree = Number($('#degree').val());
         var continuity = Number($('#continuity').val());
@@ -135,7 +150,7 @@ canvas.oncontextmenu = function (e) {
             }
         }
 
-        if (grid_flag == 1)
+        if (grid_flag === 1)
             create_grid(gridx, gridy);
 
         NUMBER_POINT = Number($('#npoint').val());
@@ -231,7 +246,7 @@ function movePathDown(id) {
     project.createPathHtml("pathList")
 }
 
-function setPathRenderList(e) {
+function setPathRenderList() {
     let input = document.getElementById("paths_render")
     if (input.value === "") {
         renderList = []
@@ -477,17 +492,25 @@ function mouseMoveFunction(e) {
             ctx.fillStyle = "#000000"
             ctx.rect(zoomBox.x.start, zoomBox.y.start, zoomBox.x.end - zoomBox.x.start, zoomBox.y.end - zoomBox.y.start)
             ctx.stroke()
-
+            let zoombutton = document.getElementById("areaZoomButton")
+            zoombutton.className = "btn btn-success"
         }
     }
 }
 
 function panfun(event) {
     event.preventDefault();
+    let button = document.getElementById("panButton")
     if (inblock) return;
 
     if (initButton)
         pan = !pan;
+        if(pan){
+            button.className = "btn btn-warning"
+        }
+        else{
+            button.className = "btn btn-success"
+        }
 }
 
 function md_openFile(event) {
@@ -656,6 +679,7 @@ function path_openFile(data) {
         }
         switch (gccod[i]) {
             case 'M':
+                //TODO: Siamo sicuri che funzioni come dovrebbe?
                 polyCP.push({'x': polytemp[0], 'y': polytemp[1]});
                 nCP++;
 //console.log("M");
@@ -1406,7 +1430,12 @@ function zoom(event, dontclear = false) {
 
 function zoomArea(event) {
     event.preventDefault()
+    if(pan){
+        return;
+    }
     mode = "zoom"
+    let zoombutton = document.getElementById("areaZoomButton")
+    zoombutton.className = "btn btn-warning"
 }
 
 function zoom_selection() {

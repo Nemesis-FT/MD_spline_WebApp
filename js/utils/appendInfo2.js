@@ -15,43 +15,43 @@ function appendInfo(myparam){
         arrayPartizioneNodaleS[i] = convert(myparam.partizioneNodaleS[i].toFixed(DIGIT));
     }
     if(period > -1){
-        var stringBreakpoint = '<label class="col-2 col-form-label"> ' + _.slice(arrayBreakpointToPrint, 0, myparam.indicePrimoBreakPoint) + ' [ '+ _.slice(arrayBreakpointToPrint, myparam.indicePrimoBreakPoint, myparam.indiceUltimoBreakPoint+1) + ' ] '+_.slice(arrayBreakpointToPrint, myparam.indiceUltimoBreakPoint+1)+'</label>';
-        var stringDegree =  '<label class="col-2 col-form-label" style="margin-right: 8px;">' + _.slice(myparam.degree, 0, myparam.indicePrimoBreakPoint) + ' [ '+ _.slice(myparam.degree, myparam.indicePrimoBreakPoint, myparam.indiceUltimoBreakPoint) + ' ] '+_.slice(myparam.degree, myparam.indiceUltimoBreakPoint)+'</label>';
-        var stringContinuity = '<label class="col-2 col-form-label" style="margin-right: 8px;">' + _.slice(myparam.continuity, 0, myparam.indicePrimoBreakPoint) + ' [ '+ _.slice(myparam.continuity, myparam.indicePrimoBreakPoint, myparam.indiceUltimoBreakPoint+1) + ' ] '+_.slice(myparam.continuity, myparam.indiceUltimoBreakPoint+1)+'</label>'
+        var stringBreakpoint = '<label> ' + _.slice(arrayBreakpointToPrint, 0, myparam.indicePrimoBreakPoint) + ' [ '+ _.slice(arrayBreakpointToPrint, myparam.indicePrimoBreakPoint, myparam.indiceUltimoBreakPoint+1) + ' ] '+_.slice(arrayBreakpointToPrint, myparam.indiceUltimoBreakPoint+1)+'</label>';
+        var stringDegree =  '<label style="margin-right: 8px;">' + _.slice(myparam.degree, 0, myparam.indicePrimoBreakPoint) + ' [ '+ _.slice(myparam.degree, myparam.indicePrimoBreakPoint, myparam.indiceUltimoBreakPoint) + ' ] '+_.slice(myparam.degree, myparam.indiceUltimoBreakPoint)+'</label>';
+        var stringContinuity = '<label style="margin-right: 8px;">' + _.slice(myparam.continuity, 0, myparam.indicePrimoBreakPoint) + ' [ '+ _.slice(myparam.continuity, myparam.indicePrimoBreakPoint, myparam.indiceUltimoBreakPoint+1) + ' ] '+_.slice(myparam.continuity, myparam.indiceUltimoBreakPoint+1)+'</label>'
 
     }
     else{
-        var stringBreakpoint = '<label class="col-2 col-form-label"> [ '+arrayBreakpointToPrint+' ] </label>'
-        var stringDegree = '<label class="col-2 col-form-label"> [ '+myparam.degree+' ] </label>'
-        var stringContinuity = '<label class="col-2 col-form-label"> [ '+ myparam.continuity +' ] </label>'
+        var stringBreakpoint = '<label> [ '+arrayBreakpointToPrint+' ] </label>'
+        var stringDegree = '<label> [ '+myparam.degree+' ] </label>'
+        var stringContinuity = '<label> [ '+ myparam.continuity +' ] </label>'
     }
     var info =
 
-    '<div class="form-group row">'
-        + '<label class="col-2 col-form-label">Number of segments</label> '
-        + '<label class="col-2 col-form-label">' + numeroSegmenti + '</label>'
+    '<div>'
+        + '<label>Number of segments</label> '
+        + '<label>' + numeroSegmenti + '</label>'
     + '</div>'
-    + '<div class="form-group row">'
-    +    '<label class="col-2 col-form-label" style="margin-right: 8px"> Break-points:</label>'
+    + '<div>'
+    +    '<label style="margin-right: 8px"> Break-points:</label>'
     +     stringBreakpoint
     +'</div>'
-    + '<div class="form-group row">'
-    +    '<label class="col-2 col-form-label" style="margin-right: 8px">Degrees:</label>'
+    + '<div>'
+    +    '<label style="margin-right: 8px">Degrees:</label>'
     +        stringDegree
     +'</div>'
-    + '<div class="form-group row">'
-    +    '<label class="col-2 col-form-label" style="margin-right: 8px">Continuities:</label>'
+    + '<div>'
+    +    '<label style="margin-right: 8px">Continuities:</label>'
     +     stringContinuity
     +'</div>'
-    +'<div class="form-group row">'
-    +    '<label class="col-2 col-form-label"> Left Knot Partition</label>'
-    +    '<div class="col-10">'
+    +'<div>'
+    +    '<label> Left Knot Partition</label>'
+    +    '<div>'
     +        '<input class="form-control" type="text" value=' +arrayPartizioneNodaleT+ '>'
     +    '</div>'
     +'</div>'
-    +'<div class="form-group row">'
-    +    '<label class="col-2 col-form-label"> Right Knot Partition</label>'
-    +    '<div class="col-10">'
+    +'<div>'
+    +    '<label> Right Knot Partition</label>'
+    +    '<div>'
     +        '<input class="form-control" type="text" value=' +arrayPartizioneNodaleS+ '>'
     +    '</div>'
     +'</div>'
