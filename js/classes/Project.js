@@ -112,11 +112,12 @@ class Project{
                             }
                         }
                         if(p===null){
-                            continue
+                            p = this.svg_source.createElement("path")
+                            svg_tag.appendChild(p)
                         }
                     }
                     if(p.tagName==="path"){
-                        p.attributes["d"].value = paths_dataset[i]
+                        p.setAttribute("d", paths_dataset[i])
                         p.setAttribute("stroke", this.paths[i].strokeColor)
                         p.setAttribute("fill", this.paths[i].fillColor)
                     }

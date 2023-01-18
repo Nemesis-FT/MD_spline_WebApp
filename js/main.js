@@ -628,7 +628,7 @@ function md_openFile(event) {
     reader.readAsText(input.files[0]);
 }
 
-function path_openFile(data) {
+function path_openFile(data, offsets=null) {
 
     function split_path(){
 
@@ -680,15 +680,32 @@ function path_openFile(data) {
         for (var ii = 0; ii < np; ii++) {
             polytemp[ii] = Number(arr[ii]);
         }
+        if(offsets!=null){
+            // Import di offset provenienti da una curva con moveto relativi
+            if(polytemp.length<2){
+                polytemp.push(offsets[0])
+                polytemp.push(offsets[1])
+            }
+            else{
+                polytemp[0] = offsets[0]
+                polytemp[1] = offsets[1]
+            }
+            offsets=null
+        }
         if (nCP > 0) {
             ipoint[0] = polyCP[nCP - 1].x;
             ipoint[1] = polyCP[nCP - 1].y;
         }
         switch (gccod[i]) {
             case 'M':
-                //TODO: Siamo sicuri che funzioni come dovrebbe?
                 if(i!==0){
-                    addPath()
+                    let svg = project.paths[project.active_path].svgSource
+                    let tmp = document.createElement("path")
+                    tmp.setAttribute("d", data.slice(gcnum[i], data.length))
+                    tmp.setAttribute("id", svg.getAttribute("id")+project.id)
+                    tmp.setAttribute("fill", svg.getAttribute("fill"))
+                    tmp.setAttribute("stroke", svg.getAttribute("stroke"))
+                    addPath(tmp)
                     path_openFile(data.slice(gcnum[i], data.length))
                     early_exit = true
                 }else{
@@ -714,12 +731,20 @@ function path_openFile(data) {
 //console.log("L");
                 break;
             case 'm':
-                polytemp[0] += ipoint[0];
-                polytemp[1] += ipoint[1];
-                polyCP.push({'x': polytemp[0], 'y': polytemp[1]});
-                nCP++;
                 if(i!==0){
+                    let svg = project.paths[project.active_path].svgSource
+                    let tmp = document.createElement("path")
+                    tmp.setAttribute("d", data.slice(gcnum[i], data.length))
+                    tmp.setAttribute("id", svg.getAttribute("id")+project.id)
+                    tmp.setAttribute("fill", svg.getAttribute("fill"))
+                    tmp.setAttribute("stroke", svg.getAttribute("stroke"))
+                    addPath(tmp)
+                    path_openFile(data.slice(gcnum[i], data.length),[polytemp[0] + ipoint[0], polytemp[1] + ipoint[1]])
                     early_exit = true
+                }
+                else{
+                    polyCP.push({'x': polytemp[0], 'y': polytemp[1]});
+                    nCP++;
                 }
 //console.log("m");
                 break;
