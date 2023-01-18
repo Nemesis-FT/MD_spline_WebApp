@@ -629,9 +629,14 @@ function md_openFile(event) {
 }
 
 function path_openFile(data) {
+
+    function split_path(){
+
+    }
+
     var numeroSegmenti = 0;
     var ampiezzaSegmenti = [];
-    polydeg = [];
+    let polydeg = [];
     var continuity = [];
     var gccont = [];
     var polyCP = [];
@@ -642,9 +647,9 @@ function path_openFile(data) {
     MyClean();
     paramd = _.cloneDeep(param);
     var polyStr = data;
-    gck = 0;
-    gccod = [];
-    gcnum = [];
+    let gck = 0;
+    let gccod = [];
+    let gcnum = [];
     var codec = 'mlhvcsqtaz';
     for (var i = 0; i < polyStr.length; i++) {
         res = polyStr.substr(i, 1);
@@ -656,11 +661,13 @@ function path_openFile(data) {
         }
     }
     gcnum[gck] = polyStr.length + 1;
-    fin = gccod.length;
-    ipoint = [];
+    let fin = gccod.length;
+    let ipoint = [];
     ipoint[0] = 0;
     ipoint[1] = 0;
-    nCP = 0;
+    let nCP = 0;
+    let early_exit = false
+    let selected_path = project.active_path
     for (var i = 0; i < fin; i++) {
         res = polyStr.slice(gcnum[i] + 1, gcnum[i + 1]);
         res = res.trim();
@@ -680,8 +687,15 @@ function path_openFile(data) {
         switch (gccod[i]) {
             case 'M':
                 //TODO: Siamo sicuri che funzioni come dovrebbe?
-                polyCP.push({'x': polytemp[0], 'y': polytemp[1]});
-                nCP++;
+                if(i!==0){
+                    addPath()
+                    path_openFile(data.slice(gcnum[i], data.length))
+                    early_exit = true
+                }else{
+                    polyCP.push({'x': polytemp[0], 'y': polytemp[1]});
+                    nCP++;
+                }
+
 //console.log("M");
                 break;
             case 'L':
@@ -704,6 +718,9 @@ function path_openFile(data) {
                 polytemp[1] += ipoint[1];
                 polyCP.push({'x': polytemp[0], 'y': polytemp[1]});
                 nCP++;
+                if(i!==0){
+                    early_exit = true
+                }
 //console.log("m");
                 break;
             case 'l':
@@ -944,7 +961,17 @@ function path_openFile(data) {
                 }
                 break;
         }
+        if(early_exit){
+            // E' vera questa cosa?
+            gcnum = gcnum.slice(0, i)
+            gccod = gccod.slice(0,i)
+            gck = i;
+            data = data.slice(0, gcnum[gcnum.length])
+            console.debug(data)
+            break;
+        }
     }
+    selectPath(project.paths[selected_path].id)
     for (var i = 0; i < numeroSegmenti; i++)
         ampiezzaSegmenti[i] = 1;
     paramd.ampiezzaSegmenti = ampiezzaSegmenti;
@@ -979,7 +1006,12 @@ function path_openFile(data) {
     controlPoint = _.clone(Struct.controlPoint);
     var period = paramd.continuity[paramd.indicePrimoBreakPoint];
     pointShape = redraw(bs, fl, controlPoint, pointShape, period, project.paths[project.active_path].strokeColor, project.paths[project.active_path].fillColor);
-    appendInfo(paramd);
+    try{
+        appendInfo(paramd);
+    }catch (e){
+
+    }
+
 }
 
 

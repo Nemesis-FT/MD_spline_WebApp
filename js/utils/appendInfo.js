@@ -1,5 +1,4 @@
 function appendInfo(myparam){
-
     var numeroSegmenti = myparam.indiceUltimoBreakPoint-myparam.indicePrimoBreakPoint;
     var numberBreakPoint = '';
     var numberDegree = '';
@@ -69,7 +68,6 @@ function appendInfo(myparam){
 
     $('#infoShape').empty();
     $('#infoShape').append(info);
-
 }
 
 function convert(value){
