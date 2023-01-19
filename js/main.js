@@ -19,20 +19,19 @@ var param = {
 }
 
 
-
-
 var NUMBER_POINT = Number($('#npoint').val());
 var paramd;
 var canvas = document.getElementById('canvas');
 let project = new Project()
-function resize(){
+
+function resize() {
     let parent = canvas.parentNode
     let styles = getComputedStyle(parent)
-    let w=parseInt(styles.getPropertyValue("width"), 10)
-    let h=parseInt(styles.getPropertyValue("height"), 10)
-    canvas.width = w -10
+    let w = parseInt(styles.getPropertyValue("width"), 10)
+    let h = parseInt(styles.getPropertyValue("height"), 10)
+    canvas.width = w - 10
     canvas.height = h
-    if(project.paths.length === 0){
+    if (project.paths.length === 0) {
         return
     }
     redraw6(pointShape, controlPoint, paramd.continuity[paramd.indicePrimoBreakPoint], project.paths[project.active_path].strokeColor, project.paths[project.active_path].fillColor);
@@ -40,6 +39,7 @@ function resize(){
         multipleRender()
     }
 }
+
 $(window).on("resize", resize);
 resize()
 var ctx = canvas.getContext("2d");
@@ -95,9 +95,11 @@ addPath()
 selectPath(0)
 paramd = _.cloneDeep(project.paths[project.active_path].getParamd());
 
-
-//prende in input un punto schermo (coord. viewport) e le
-//trasforma in coordinate della griglia (grid)
+/**
+ * Takes as input a screen point (viewport coordinates) and transforms them in grid coordinates.
+ * @param ipoint
+ * @returns {*}
+ */
 function gridPoint(ipoint) {
     if (grid_flag === 1) {
         var ix = Math.trunc(0.5 + ipoint.x / hx);
@@ -108,11 +110,12 @@ function gridPoint(ipoint) {
     return ipoint;
 }
 
-//click button destro sul canvas (che e' interno ad un elemento div)
-//richiama appendOption se si e' precedentemente individuato con il
-//mouse un break-point sulla curva
-//inblock a true indica che siamo nel menu' di secondo livello e
-//quindi disabilita il menu' di primo livello
+/**
+ * Upon rightclick on canvas, appendOption is then called if a breakpoint was selected on the spline.
+ * The "inblock" variable is used to go to a deeper level in the menus.
+ * @param e an event
+ * @returns {boolean}:
+ */
 canvas.oncontextmenu = function (e) {
     e.preventDefault();
     if (initButton) {
@@ -125,8 +128,8 @@ canvas.oncontextmenu = function (e) {
             IDelement = -1;
         return;
     } else {
-//di qui ci passa solo la prima volta dopo aver cliccato su Clean,
-//inseriti i CP iniziali e poi terminati con button destro
+        //di qui ci passa solo la prima volta dopo aver cliccato su Clean,
+        //inseriti i CP iniziali e poi terminati con button destro
         initButton = true;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         paramd = _.cloneDeep(project.paths[project.active_path].getParamd());
@@ -169,13 +172,20 @@ canvas.oncontextmenu = function (e) {
 
 }
 
-function addPath(svg_data=null) {
+/**
+ * Function that adds a path to the project.
+ * @param svg_data the original svg representation - if present.
+ */
+function addPath(svg_data = null) {
     project.addPath(svg_data)
     initButton = false;
     project.createPathHtml("pathList")
     selectPath(project.id - 1)
 }
 
+/**
+ * Function that removes the selected path from the project.
+ */
 function removePath() {
     if (project.paths.length < 2) {
         alert("One path must remain.")
@@ -193,13 +203,23 @@ function removePath() {
     selectPath(id, true);
 }
 
+/**
+ * Function that is used to select the active path among the ones inside the project.
+ * In order to minimize the number of structural changes, the project.paths array is used as a main repository.
+ * When a new path needs to be loaded, the internal structures are filled up with the corresponding data, stored inside
+ * the structure.
+ * @param id the id of the selected path
+ * @param nosave boolean that enables (or disables) backing up the path data to the project structure
+ * @param dontdraw boolean that enables (or disables) curve redrawing.
+ */
 function selectPath(id, nosave = false, dontdraw = false) {
-    // Salvataggio caratteristiche curva
+
     if (id === null || id === undefined) {
         return
     }
     if (!nosave) {
         try {
+            // Curve back-up
             project.paths[project.active_path].paramd = paramd;
             project.paths[project.active_path].controlPoint = controlPoint
             project.paths[project.active_path].pointShape = pointShape
@@ -211,7 +231,7 @@ function selectPath(id, nosave = false, dontdraw = false) {
         } catch (e) {
         }
     }
-    // Caricamento caratteristiche curva selezionata
+    // Selected curve data loading
     paramd = project.selectPath(id).paramd
     controlPoint = project.paths[project.active_path].controlPoint
     pointShape = project.paths[project.active_path].pointShape
@@ -220,48 +240,56 @@ function selectPath(id, nosave = false, dontdraw = false) {
     IDelement = project.paths[project.active_path].IDelement
     fl = project.paths[project.active_path].fl
     bs = project.paths[project.active_path].bs
-    if(project.paths[project.active_path].strokeColor){
-        strokeColorInput.value = project.paths[project.active_path].strokeColor.slice(0,7)
-    }
-    else{
+    if (project.paths[project.active_path].strokeColor) {
+        strokeColorInput.value = project.paths[project.active_path].strokeColor.slice(0, 7)
+    } else {
         strokeColorInput.value = "#000000"
     }
-    if(project.paths[project.active_path].fillColor){
-        fillColorInput.value = project.paths[project.active_path].fillColor.slice(0,7)
-    }
-    else{
+    if (project.paths[project.active_path].fillColor) {
+        fillColorInput.value = project.paths[project.active_path].fillColor.slice(0, 7)
+    } else {
         fillColorInput.value = "#000000"
     }
 
 
-    //Draw della curva caricata
+    //Draw of the curves
     if (!dontdraw) {
         multipleRender()
-        //zoom(new Event("", undefined), dontdraw);
     }
+    // Update paths info
     let current = document.getElementById("current_path")
     current.innerText = "Current path is #" + (id).toString();
-
+    // Display current path data
     appendInfo(paramd)
-    //redraw2(pointShape, controlPoint, IDlinePoint);
 }
 
+/**
+ * Moves a path up in the paths stack.
+ * @param id the id of the path that needs to be swapped.
+ */
 function movePathUp(id) {
     project.switchPath(id, true)
     project.createPathHtml("pathList")
     selectPath(id, true, false)
     let current = document.getElementById("current_path")
-    current.innerText = "Current path is #"+(id).toString();
+    current.innerText = "Current path is #" + (id).toString();
 }
 
+/**
+ * Moves a path down in the paths stack.
+ * @param id the id of the path that needs to be swapped.
+ */
 function movePathDown(id) {
     project.switchPath(id, false)
     project.createPathHtml("pathList")
     selectPath(id, true, false)
     let current = document.getElementById("current_path")
-    current.innerText = "Current path is #"+(id).toString();
+    current.innerText = "Current path is #" + (id).toString();
 }
 
+/**
+ * Sets the list of paths to be rendered, reading from the "paths_render" widget.
+ */
 function setPathRenderList() {
     let input = document.getElementById("paths_render")
     if (input.value === "") {
@@ -269,8 +297,8 @@ function setPathRenderList() {
         return;
     }
     let ids = []
-    if (input.value === "*"){
-        for(let i=0; i<project.paths.length; i++){
+    if (input.value === "*") {
+        for (let i = 0; i < project.paths.length; i++) {
             ids.push(project.paths[i].id)
         }
         renderList = ids
@@ -294,11 +322,14 @@ function setPathRenderList() {
     multipleRender();
 }
 
+/**
+ * Render multiple paths in a single go
+ */
 function multipleRender() {
     let active_path = project.paths[project.active_path]
     let active = project.active_path
     //ctx.clearRect(0, 0, canvas.width, canvas.height);
-    for (let i = 0; i <project.paths.length ; i++) {
+    for (let i = 0; i < project.paths.length; i++) {
         if (renderList.includes(project.paths[i].id)) {
             selectPath(project.paths[i].id, false, true)
             let e = new Event("", undefined);
@@ -314,17 +345,21 @@ function multipleRender() {
     selectPath(active_path.id, false, true)
 }
 
+/**
+ * Enables/Disables multilayer transformations
+ */
 function transform_switch() {
     transform_multilayer = !transform_multilayer;
 }
 
-/*
-
+/**
+ * Function that handles mouseup buttons events
+ * @param e
  */
-
 function mouseUpFunction(e) {
     e.preventDefault();
     if (inblock) return
+    // Create points if in draw mode
     if (mode === "draw") {
         if (IDelement !== -1) {
             IDelement = -1;
@@ -346,6 +381,7 @@ function mouseUpFunction(e) {
             }
         }
     }
+    // Zoom on target box if drawn (pan and zoom)
     if (mode === "zoom") {
         dragging = false
         mode = "draw"
@@ -379,6 +415,11 @@ function mouseUpFunction(e) {
     }
 }
 
+/**
+ * Normalize coordinates
+ * @param e
+ * @returns {{x: number, y: number}}
+ */
 function normalize_coords(e) {
     let element = canvas, offsetX = 0, offsetY = 0, mx, my;
     if (element.offsetParent !== undefined) {
@@ -392,6 +433,10 @@ function normalize_coords(e) {
     return {x: mx, y: my};
 }
 
+/**
+ * Function that handles mousedown events.
+ * @param e
+ */
 function mouseDownFunction(e) {
     e.preventDefault();
     if (inblock) return;
@@ -407,6 +452,7 @@ function mouseDownFunction(e) {
             IDpointCurve = intersect(e, pointShape);
         }
     }
+    // Start zoom box coordinates
     if (mode === "zoom") {
         dragging = true
         var coords = normalize_coords(e)
@@ -415,6 +461,12 @@ function mouseDownFunction(e) {
     }
 }
 
+/**
+ * Pan the view using a starting point.
+ * @param ipoint
+ * @param isPoint
+ * @param useOffsets
+ */
 function panning(ipoint, isPoint = true, useOffsets = false) {
     var dex, dey;
     if (isPoint) {
@@ -451,10 +503,18 @@ function panning(ipoint, isPoint = true, useOffsets = false) {
     }
 }
 
-function toggleFill(e){
+/**
+ * Toggles/untoggles shape filling
+ * @param e
+ */
+function toggleFill(e) {
     fill = !fill
 }
 
+/**
+ * Handles mouse move event
+ * @param e
+ */
 function mouseMoveFunction(e) {
     e.preventDefault();
     if (inblock) return;
@@ -468,25 +528,21 @@ function mouseMoveFunction(e) {
             }
 
         }
-
-
         if (IDelement !== -1) {
             var ipoint = getMousePos(e);
             ipoint = gridPoint(ipoint);
-
             if (pan) {
                 panning(ipoint)
             } else {
-
-//aggiorno la posizione dell'elemento in posizione IDelement
+                //aggiorno la posizione dell'elemento in posizione IDelement
                 controlPoint[IDelement] = ipoint;
-//Ridisegno tutto
+                //Ridisegno tutto
                 var period = paramd.continuity[paramd.indicePrimoBreakPoint];
                 var gcind = findSupport(paramd, IDelement);
                 for (var i = 0; i < gcind.length; i++)
                     gcind[i] = gcind[i] * NUMBER_POINT;
 
-//    pointShape = redraw(bs, fl, controlPoint, period);
+                //pointShape = redraw(bs, fl, controlPoint, period);
                 pointShape = redraw4(bs, controlPoint, pointShape, period, gcind, project.paths[project.active_path].strokeColor, project.paths[project.active_path].fillColor);
                 if (renderList.length !== 0) {
                     multipleRender()
@@ -494,6 +550,7 @@ function mouseMoveFunction(e) {
             }
         }
     }
+    // Draw the zoombox
     if (mode === "zoom") {
         if (dragging) {
             var coords = normalize_coords(e)
@@ -515,6 +572,10 @@ function mouseMoveFunction(e) {
     }
 }
 
+/**
+ * Function that enables (or disables) the panning function.
+ * @param event
+ */
 function panfun(event) {
     event.preventDefault();
     let button = document.getElementById("panButton")
@@ -522,14 +583,17 @@ function panfun(event) {
 
     if (initButton)
         pan = !pan;
-        if(pan){
-            button.className = "btn btn-warning"
-        }
-        else{
-            button.className = "btn btn-success"
-        }
+    if (pan) {
+        button.className = "btn btn-warning"
+    } else {
+        button.className = "btn btn-success"
+    }
 }
 
+/**
+ * Function used to open the .md proprietary file type.
+ * @param event
+ */
 function md_openFile(event) {
     event.preventDefault();
     var input = event.target;
@@ -545,7 +609,7 @@ function md_openFile(event) {
     reader.onload = function () {
 
         MyClean();
-        paramd = _.cloneDeep(project.active_path.getParamd());
+        paramd = _.cloneDeep(paramd);
         var text = reader.result;
         var arrayText = text.split("\n");
         for (var i = 0; i < arrayText.length; i++) {
@@ -645,12 +709,12 @@ function md_openFile(event) {
     reader.readAsText(input.files[0]);
 }
 
-function path_openFile(data, offsets=null) {
-
-    function split_path(){
-
-    }
-
+/**
+ * Function used to parse the contents of a path data string.
+ * @param data the pathdata
+ * @param offsets offsets used if the previous path used a 'm' command.
+ */
+function path_openFile(data, offsets = null) {
     var numeroSegmenti = 0;
     var ampiezzaSegmenti = [];
     let polydeg = [];
@@ -697,17 +761,16 @@ function path_openFile(data, offsets=null) {
         for (var ii = 0; ii < np; ii++) {
             polytemp[ii] = Number(arr[ii]);
         }
-        if(offsets!=null){
+        if (offsets != null) {
             // Import di offset provenienti da una curva con moveto relativi
-            if(polytemp.length<2){
+            if (polytemp.length < 2) {
                 polytemp.push(offsets[0])
                 polytemp.push(offsets[1])
-            }
-            else{
+            } else {
                 polytemp[0] = offsets[0]
                 polytemp[1] = offsets[1]
             }
-            offsets=null
+            offsets = null
         }
         if (nCP > 0) {
             ipoint[0] = polyCP[nCP - 1].x;
@@ -715,22 +778,21 @@ function path_openFile(data, offsets=null) {
         }
         switch (gccod[i]) {
             case 'M':
-                if(i!==0){
+                if (i !== 0) {
+                    // If a moveto command is found, the path parsing is interrupted. A new path gets created, and recursively parsed.
                     let svg = project.paths[project.active_path].svgSource
                     let tmp = document.createElement("path")
                     tmp.setAttribute("d", data.slice(gcnum[i], data.length))
-                    tmp.setAttribute("id", svg.getAttribute("id")+project.id)
+                    tmp.setAttribute("id", svg.getAttribute("id") + project.id)
                     tmp.setAttribute("fill", svg.getAttribute("fill"))
                     tmp.setAttribute("stroke", svg.getAttribute("stroke"))
                     addPath(tmp)
                     path_openFile(data.slice(gcnum[i], data.length))
                     early_exit = true
-                }else{
+                } else {
                     polyCP.push({'x': polytemp[0], 'y': polytemp[1]});
                     nCP++;
                 }
-
-//console.log("M");
                 break;
             case 'L':
                 for (var ii = 1; ii <= np / 2; ii++) {
@@ -741,29 +803,22 @@ function path_openFile(data, offsets=null) {
                     gccont[numeroSegmenti] = 0;
                     numeroSegmenti++;
                 }
-//                    polydeg.push(1);
-//                    polyCP.push({'x':polytemp[0], 'y':polytemp[1]});
-//                    nCP++;
-//                    numeroSegmenti++;
-//console.log("L");
                 break;
             case 'm':
-                if(i!==0){
+                if (i !== 0) {
                     let svg = project.paths[project.active_path].svgSource
                     let tmp = document.createElement("path")
                     tmp.setAttribute("d", data.slice(gcnum[i], data.length))
-                    tmp.setAttribute("id", svg.getAttribute("id")+project.id)
+                    tmp.setAttribute("id", svg.getAttribute("id") + project.id)
                     tmp.setAttribute("fill", svg.getAttribute("fill"))
                     tmp.setAttribute("stroke", svg.getAttribute("stroke"))
                     addPath(tmp)
-                    path_openFile(data.slice(gcnum[i], data.length),[polytemp[0] + ipoint[0], polytemp[1] + ipoint[1]])
+                    path_openFile(data.slice(gcnum[i], data.length), [polytemp[0] + ipoint[0], polytemp[1] + ipoint[1]])
                     early_exit = true
-                }
-                else{
+                } else {
                     polyCP.push({'x': polytemp[0], 'y': polytemp[1]});
                     nCP++;
                 }
-//console.log("m");
                 break;
             case 'l':
                 for (var ii = 1; ii <= np / 2; ii++) {
@@ -778,12 +833,6 @@ function path_openFile(data, offsets=null) {
                     gccont[numeroSegmenti] = 0;
                     numeroSegmenti++;
                 }
-//                    polydeg.push(1);
-//                    polytemp[0]+=ipoint[0];
-//                    polytemp[1]+=ipoint[1];
-//                    polyCP.push({'x':polytemp[0], 'y':polytemp[1]});
-//                    nCP++;
-//                    numeroSegmenti++;
                 break;
             case 'H':
                 for (var ii = 1; ii <= np; ii++) {
@@ -794,11 +843,6 @@ function path_openFile(data, offsets=null) {
                     gccont[numeroSegmenti] = 0;
                     numeroSegmenti++;
                 }
-//                    polydeg.push(1);
-//                    polyCP.push({'x':polytemp[0], 'y':polyCP[nCP-1].y});
-//                    nCP++;
-//                    numeroSegmenti++;
-//console.log("H");
                 break;
             case 'h':
                 for (var ii = 1; ii <= np; ii++) {
@@ -822,7 +866,6 @@ function path_openFile(data, offsets=null) {
                     gccont[numeroSegmenti] = 0;
                     numeroSegmenti++;
                 }
-//console.log("V");
                 break;
             case 'v':
                 for (var ii = 1; ii <= np; ii++) {
@@ -876,8 +919,6 @@ function path_openFile(data, offsets=null) {
             case 'S':
                 for (var ii = 1; ii <= np / 4; ii++) {
                     polydeg.push(3);
-//                        polyCP.push({'x':2*polyCP[nCP-1].x-polyCP[nCP-2].x, 'y':2*polyCP[nCP-1].y-polyCP[nCP-2].y});
-//                        nCP++;
                     polyCP[nCP - 1].x = 2 * polyCP[nCP - 1].x - polyCP[nCP - 2].x;
                     polyCP[nCP - 1].y = 2 * polyCP[nCP - 1].y - polyCP[nCP - 2].y;
                     i1 = 4 * (ii - 1);
@@ -892,8 +933,6 @@ function path_openFile(data, offsets=null) {
             case 's':
                 for (var ii = 1; ii <= np / 4; ii++) {
                     polydeg.push(3);
-//                        polyCP.push({'x':2*polyCP[nCP-1].x-polyCP[nCP-2].x, 'y':2*polyCP[nCP-1].y-polyCP[nCP-2].y});
-//                        nCP++;
                     polyCP[nCP - 1].x = 2 * polyCP[nCP - 1].x - polyCP[nCP - 2].x;
                     polyCP[nCP - 1].y = 2 * polyCP[nCP - 1].y - polyCP[nCP - 2].y;
                     i1 = 4 * (ii - 1);
@@ -922,7 +961,6 @@ function path_openFile(data, offsets=null) {
                     gccont[numeroSegmenti] = 0;
                     numeroSegmenti++;
                 }
-//console.log("Q");
                 break;
             case 'q':
                 for (var ii = 1; ii <= np / 4; ii++) {
@@ -945,8 +983,6 @@ function path_openFile(data, offsets=null) {
             case 'T':
                 for (var ii = 1; ii <= np / 2; ii++) {
                     polydeg.push(2);
-//                        polyCP.push({'x':2*polyCP[nCP-1].x-polyCP[nCP-2].x, 'y':2*polyCP[nCP-1].y-polyCP[nCP-2].y});
-//                        nCP++;
                     polyCP[nCP - 1].x = 2 * polyCP[nCP - 1].x - polyCP[nCP - 2].x;
                     polyCP[nCP - 1].y = 2 * polyCP[nCP - 1].y - polyCP[nCP - 2].y;
                     i1 = 2 * (ii - 1);
@@ -955,13 +991,10 @@ function path_openFile(data, offsets=null) {
                     gccont[numeroSegmenti] = 1;
                     numeroSegmenti++;
                 }
-//console.log("T");
                 break;
             case 't':
                 for (var ii = 1; ii <= np / 2; ii++) {
                     polydeg.push(2);
-//                        polyCP.push({'x':2*polyCP[nCP-1].x-polyCP[nCP-2].x, 'y':2*polyCP[nCP-1].y-polyCP[nCP-2].y});
-//                        nCP++;
                     polyCP[nCP - 1].x = 2 * polyCP[nCP - 1].x - polyCP[nCP - 2].x;
                     polyCP[nCP - 1].y = 2 * polyCP[nCP - 1].y - polyCP[nCP - 2].y;
                     i1 = 2 * (ii - 1);
@@ -1003,16 +1036,17 @@ function path_openFile(data, offsets=null) {
                 }
                 break;
         }
-        if(early_exit){
-            // E' vera questa cosa?
+        if (early_exit) {
+            // Early exit function, used if a moveto command was detected.
             gcnum = gcnum.slice(0, i)
-            gccod = gccod.slice(0,i)
+            gccod = gccod.slice(0, i)
             gck = i;
             data = data.slice(0, gcnum[gcnum.length])
             console.debug(data)
             break;
         }
     }
+    // Fill in the data
     selectPath(project.paths[selected_path].id)
     for (var i = 0; i < numeroSegmenti; i++)
         ampiezzaSegmenti[i] = 1;
@@ -1048,15 +1082,18 @@ function path_openFile(data, offsets=null) {
     controlPoint = _.clone(Struct.controlPoint);
     var period = paramd.continuity[paramd.indicePrimoBreakPoint];
     pointShape = redraw(bs, fl, controlPoint, pointShape, period, project.paths[project.active_path].strokeColor, project.paths[project.active_path].fillColor);
-    try{
+    try {
         appendInfo(paramd);
-    }catch (e){
+    } catch (e) {
 
     }
 
 }
 
-
+/**
+ * Save a single path in the proprietary .md format
+ * @param event
+ */
 function md_saveFile(event) {
     event.preventDefault();
     if (inblock) return;
@@ -1106,6 +1143,11 @@ function md_saveFile(event) {
     }
 }
 
+/**
+ * Save a whole SVG file
+ * @param event
+ * @returns {Promise<void>} the promised svg file.
+ */
 async function svg_saveFile(event) {
     let active = project.active_path;
     let dataset = []
@@ -1122,17 +1164,22 @@ async function svg_saveFile(event) {
     await saveTextAs(svg, "newFile.svg")
 }
 
-function svg_adaptor(path){
+/**
+ * Convert the compressed SVG path syntax in a standard one and translate shapes into paths.
+ * @param path the path
+ * @returns {string} the normalized string
+ */
+function svg_adaptor(path) {
     // Sometimes SVGs are provided in a compressed format, which will not be understood by the parser.
-    try{
+    try {
         let pathdata = path.getPathData({normalize: true})
         console.debug(pathdata)
         let d = ""
         let cmd = ""
-        for(let i=0; i<pathdata.length; i++){
+        for (let i = 0; i < pathdata.length; i++) {
             cmd += pathdata[i].type + " "
-            for(let k=0; k<pathdata[i].values.length; k++){
-                cmd += pathdata[i].values[k]+" "
+            for (let k = 0; k < pathdata[i].values.length; k++) {
+                cmd += pathdata[i].values[k] + " "
             }
             d += cmd
             cmd = ""
@@ -1145,6 +1192,10 @@ function svg_adaptor(path){
 
 }
 
+/**
+ * Load a whole SVG file
+ * @param event
+ */
 function svg_loadFile(event) {
     project = new Project()
     let reader = new FileReader()
@@ -1156,6 +1207,7 @@ function svg_loadFile(event) {
         project.setSvgSource(svgDoc)
         let paths = await svgDoc.querySelectorAll("path, ellipse, rect, circle, line, polyline, polygon")
         for (let i = 0; i < paths.length; i++) {
+            // Each path is temporarely loaded in the "pathbuffer" element, to then get parsed.
             let path = document.getElementById("pathbuffer")
             path = paths[i]
             addPath(paths[i])
@@ -1167,18 +1219,19 @@ function svg_loadFile(event) {
         selectPath(0, false, false)
         let input = document.getElementById("paths_render")
         input.value = "*"
-        if(fill===false){
+        if (fill === false) {
             toggleFill(event)
         }
-
-
         setPathRenderList()
-
-        //mirrorX(event)
     }
     reader.readAsText(event.target.files[0])
 }
 
+/**
+ * Path data saving routine, converts internal representation to a svg path data
+ * @param event
+ * @returns {string} the path data
+ */
 function path_saveFile(event) {
     event.preventDefault();
     let scale = 1
@@ -1192,7 +1245,7 @@ function path_saveFile(event) {
         var file = '';
         var tt = [];
 
-//controllo che i knot interval siano unitari (partizione uniforme)
+        //controllo che i knot interval siano unitari (partizione uniforme)
         var i = 0;
         while (i < paramd.ampiezzaSegmenti.length && Math.abs(1 - paramd.ampiezzaSegmenti[i]) < 0.001) {
             i++;
@@ -1200,12 +1253,11 @@ function path_saveFile(event) {
         if (i != paramd.ampiezzaSegmenti.length) {
             flag = 0;
             alert("Operation not permitted! It is not an SVG path: non-uniform partition.")
-//        console.log("non e' un path SVG 1");
             return;
         } else
             flag = 1;
 
-//controllo che tutti i tratti siano di grado <= 3
+        //controllo che tutti i tratti siano di grado <= 3
         var i = paramd.indicePrimoBreakPoint;
         while (i < paramd.indiceUltimoBreakPoint && paramd.degree[i] <= 3) {
             i++;
@@ -1213,14 +1265,13 @@ function path_saveFile(event) {
         if (i != paramd.indiceUltimoBreakPoint) {
             flag = 0;
             alert("Operation not permitted! It is not an SVG path: segments of degree greater than 3.")
-//        console.log("non e' un path SVG 2");
             return;
         } else
             flag = 1;
 
-//se i due controlli precedenti sono passati, allora posso salvare la curva come un path SVG
+        //se i due controlli precedenti sono passati, allora posso salvare la curva come un path SVG
         if (flag == 1) {
-//preparo vettore da inserire (knot-insertion) per rappresentare la curva come C^0
+            //preparo vettore da inserire (knot-insertion) per rappresentare la curva come C^0
             var j = 0;
             for (i = paramd.indicePrimoBreakPoint + 1; i < paramd.indiceUltimoBreakPoint; i++) {
                 for (var ii = 0; ii < paramd.continuity[i]; ii++) {
@@ -1228,7 +1279,7 @@ function path_saveFile(event) {
                     j++;
                 }
             }
-//se ci sono dei knot da inserire si entra in questo if
+            //se ci sono dei knot da inserire si entra in questo if
             if (j > 0) {
                 var gc_param = _.cloneDeep(paramd, true);
                 var gc_controlPoint = _.cloneDeep(controlPoint, true);
@@ -1242,10 +1293,9 @@ function path_saveFile(event) {
             } else
                 var gcControlPoint = _.cloneDeep(controlPoint, true);
 
-//trasformo i CP da coord. viewport a coord. window
+            //trasformo i CP da coord. viewport a coord. window
             gcControlPoint = view_wind(gcControlPoint);
-// console.log(gcControlPoint.length)
-//li memorizzo in un file secondo la sintassi di un path SVG
+            //li memorizzo in un file secondo la sintassi di un path SVG
             j = 0;
             file = "M " + convert(gcControlPoint[j].x.toFixed(DIGIT)) + " " + convert(gcControlPoint[j].y.toFixed(DIGIT));
             j++;
@@ -1255,10 +1305,9 @@ function path_saveFile(event) {
             for (i = paramd.indicePrimoBreakPoint; i < paramd.indiceUltimoBreakPoint; i++) {
                 cmd = ""
                 try {
-//console.log(paramd.indicePrimoBreakPoint, i, paramd.degree[i]);
                     switch (paramd.degree[i]) {
                         case 1:
-                            cmd += " L " + convert(gcControlPoint[j].x.toFixed(DIGIT)*scale) + " " + convert(gcControlPoint[j].y.toFixed(DIGIT)*scale);
+                            cmd += " L " + convert(gcControlPoint[j].x.toFixed(DIGIT) * scale) + " " + convert(gcControlPoint[j].y.toFixed(DIGIT) * scale);
                             j++;
                             break;
                         case 2:
@@ -1304,7 +1353,6 @@ function path_saveFile(event) {
                                         cmd += " C ";
                                     else
                                         cmd += " ";
-//            console.log(j)
                                     cmd += convert(gcControlPoint[j].x.toFixed(DIGIT) * scale) + " " + convert(gcControlPoint[j].y.toFixed(DIGIT) * scale);
                                     j++;
                                     cmd += " " + convert(gcControlPoint[j].x.toFixed(DIGIT) * scale) + " " + convert(gcControlPoint[j].y.toFixed(DIGIT) * scale);
@@ -1326,11 +1374,16 @@ function path_saveFile(event) {
     }
 }
 
+/**
+ * This function is responsable for a major headache. It caused major issues, but now its inoffensive.
+ * @param controlPoint
+ * @returns {{controlPoint}}
+ */
 function wind_view(controlPoint) {
     return {controlPoint: controlPoint};
-
-    // I've been hunting this bug for days. This function is why everything does not stay in its proper position.
+    /*
     var arrayX = [];
+
     var arrayY = [];
     for (var i = 0; i < controlPoint.length; i++) {
         arrayX.push(controlPoint[i].x);
@@ -1364,12 +1417,16 @@ function wind_view(controlPoint) {
         controlPoint[i].y = scy * (wymin - controlPoint[i].y) + vymax;
     }
     return {controlPoint: controlPoint};
+    */
 }
-
+/**
+ * This function is responsable for a major headache. It caused major issues, but now its inoffensive.
+ * @param myControlPointToSend
+ * @returns {{myControlPointToSend}}
+ */
 function view_wind(myControlPointToSend) {
-//converte i controlPoint da coord. viewport alle coordinate
-//di una window [0,1]x[0,1]
     return myControlPointToSend
+    /*
     var arrayX = [];
     var arrayY = [];
     for (var i = 0; i < myControlPointToSend.length; i++) {
@@ -1397,8 +1454,12 @@ function view_wind(myControlPointToSend) {
         myControlPointToSend[i].y = (gc_vymax - myControlPointToSend[i].y) / scy;
     }
     return myControlPointToSend;
+    */
 }
 
+/**
+ * Mousewheel handler, allows zooming.
+ */
 $("canvas").mousewheel(function (ev, val) {
     if (inblock) return;
 
@@ -1417,7 +1478,7 @@ $("canvas").mousewheel(function (ev, val) {
         if (renderList.length !== 0) {
             multipleRender()
         } else {
-            redraw1(pointShape, controlPoint, period, false,project.paths[project.active_path].strokeColor, project.paths[project.active_path].fillColor);
+            redraw1(pointShape, controlPoint, period, false, project.paths[project.active_path].strokeColor, project.paths[project.active_path].fillColor);
         }
     }
     return;
@@ -1431,6 +1492,10 @@ document.getElementById("canvas").onmousewheel = function (event) {
     event.preventDefault();
 };
 
+/**
+ * Draws a grid.
+ * @param event
+ */
 function gridfun(event) {
 
     event.preventDefault();
@@ -1456,7 +1521,11 @@ function gridfun(event) {
     }
 }
 
-function calc_wminmax(){
+/**
+ * Calculates bounding box of drawing.
+ * @returns {{ymin: *, xmin: *, ymax: *, xmax: *}}
+ */
+function calc_wminmax() {
     var arrayX = [];
     var arrayY = [];
     for (let k = 0; k < project.paths.length; k++) {
@@ -1474,9 +1543,14 @@ function calc_wminmax(){
     let wymin = _.min(arrayY);
     let wxmax = _.max(arrayX);
     let wymax = _.max(arrayY);
-    return {xmax:wxmax , xmin:wxmin, ymax:wymax, ymin:wymin}
+    return {xmax: wxmax, xmin: wxmin, ymax: wymax, ymin: wymin}
 }
 
+/**
+ * Zoom function
+ * @param event
+ * @param dontclear clear (or not) the screen
+ */
 function zoom(event, dontclear = false) {
     if (inblock) return;
 
@@ -1494,8 +1568,6 @@ function zoom(event, dontclear = false) {
                 arrayY.push(controlPoint[i].y);
             }
         }
-
-
         wxmin = _.min(arrayX);
         wymin = _.min(arrayY);
         wxmax = _.max(arrayX);
@@ -1511,9 +1583,13 @@ function zoom(event, dontclear = false) {
     }
 }
 
+/**
+ * Enters "zoom" mode (allows area zooming)
+ * @param event
+ */
 function zoomArea(event) {
     event.preventDefault()
-    if(pan){
+    if (pan) {
         return;
     }
     mode = "zoom"
@@ -1521,6 +1597,9 @@ function zoomArea(event) {
     zoombutton.className = "btn btn-warning"
 }
 
+/**
+ * Zoom on area function
+ */
 function zoom_selection() {
     let vratio = (zoomBox.y.end - zoomBox.y.start) / canvas.height
     let active = project.active_path
@@ -1534,10 +1613,16 @@ function zoom_selection() {
     selectPath(project.paths[active].id, false, true)
 }
 
+/**
+ * Zooms view based on scrollwheel
+ * @param pointShape
+ * @param controlPoint
+ * @param flagwheel
+ * @param vscale
+ */
 function zoom_view(pointShape, controlPoint, flagwheel, vscale = null) {
-//applica uno zoom ai controlPoint per portarli a pieno schermo/canvas
-//flagwheel e' >0 o <0 a seconda di come sto girando la rotella del mouse
-    // Ci sono dei problemi...
+    //applica uno zoom ai controlPoint per portarli a pieno schermo/canvas
+    //flagwheel e' >0 o <0 a seconda di come sto girando la rotella del mouse
     if (flagwheel !== 0) {
         if (flagwheel < 0)
             sc = 1.1;
@@ -1570,17 +1655,17 @@ function zoom_view(pointShape, controlPoint, flagwheel, vscale = null) {
         wxmin = wxmin - 0.5 * (temp - (wxmax - wxmin));
         wxmax = wxmax + 0.5 * (temp - (wxmax - wxmin));
     }
-//aggiorna controlPoint
+    //aggiorna controlPoint
     for (var i = 0; i < controlPoint.length; i++) {
         controlPoint[i].x = scx * (controlPoint[i].x - wxmin) + vxmin;
         controlPoint[i].y = scy * (controlPoint[i].y - wymin) + vymin;
     }
-//aggiorna punti valutazione curva
+    //aggiorna punti valutazione curva
     for (var i = 0; i < pointShape.length; i++) {
         pointShape[i].x = scx * (pointShape[i].x - wxmin) + vxmin;
         pointShape[i].y = scy * (pointShape[i].y - wymin) + vymin;
     }
-//aggiorna estremi window a quelli della viewport
+    //aggiorna estremi window a quelli della viewport
     wxmin = vxmin;
     wymin = vymin;
     wxmax = vxmax;
@@ -1623,15 +1708,22 @@ function drawMDBS(event) {
     }
 }
 
-function setStrokeColor (event){
+/**
+ * Sets line color.
+ * @param event
+ */
+function setStrokeColor(event) {
     project.paths[project.active_path].strokeColor = event.target.value
     redraw6(pointShape, controlPoint, paramd.continuity[paramd.indicePrimoBreakPoint], project.paths[project.active_path].strokeColor, project.paths[project.active_path].fillColor);
     if (renderList.length !== 0) {
         multipleRender()
     }
 }
-
-function setFillColor(event){
+/**
+ * Sets filling color.
+ * @param event
+ */
+function setFillColor(event) {
     project.paths[project.active_path].fillColor = event.target.value
     redraw6(pointShape, controlPoint, paramd.continuity[paramd.indicePrimoBreakPoint], project.paths[project.active_path].strokeColor, project.paths[project.active_path].fillColor);
     if (renderList.length !== 0) {
@@ -1639,6 +1731,11 @@ function setFillColor(event){
     }
 }
 
+/**
+ * Hides controlpoints
+ * @param event
+ * @param clear
+ */
 function drawOnlyCurve(event, clear = true) {
     event.preventDefault();
     if (inblock) return;
@@ -1664,6 +1761,10 @@ function drawInside(event) {
     }
 }
 
+/**
+ * UPApproximation function.
+ * @param event
+ */
 function upapprox(event) {
     event.preventDefault();
     if (inblock) return;
@@ -1688,10 +1789,9 @@ function upapprox(event) {
         for (i = 0; i < cpx.length; i++) {
             controlPoint[i] = {x: cpx[i], y: cpy[i]};
         }
-
-//GC 11/08/2021
-//aggiunte per rendere partizione nodale con intervalli unnitari
-//e poter salvare la curva come SVG
+        //GC 11/08/2021
+        //aggiunte per rendere partizione nodale con intervalli unnitari
+        //e poter salvare la curva come SVG
         temp = 1.0;
         paramd.estremoA = 0;
         paramd.estremoB = numeroSegmenti;
@@ -1703,7 +1803,7 @@ function upapprox(event) {
             paramd.breakPoint[i] = temp;
         }
         paramd = partizioniNodali(paramd);
-//GC 11/08/2021
+        //GC 11/08/2021
 
         NUMBER_POINT = Number($('#npoint').val());
 
@@ -1719,7 +1819,11 @@ function upapprox(event) {
     }
 }
 
-//calcola il baricentro dei Control Point
+/**
+ * Calculates point baricenter
+ * @param controlPoint
+ * @returns {{cx: number, cy: number}}
+ */
 function baricenter(controlPoint) {
     var arrayX = [];
     var arrayY = [];
@@ -1732,12 +1836,15 @@ function baricenter(controlPoint) {
     return {cx: cx, cy: cy};
 }
 
+/**
+ * Rotates path
+ * @param event
+ */
 function rotate(event) {
     event.preventDefault();
     if (inblock) return;
-
     if (initButton) {
-//Ruota di 90 gradi in senso antiorario i CP rispetto al proprio baricentro e ridisegna
+        //Ruota di 90 gradi in senso antiorario i CP rispetto al proprio baricentro e ridisegna
         let active = project.active_path;
         for (let k = 0; k < project.paths.length; k++) {
             if (!transform_multilayer && project.paths[k].id !== project.paths[active].id) {
@@ -1775,12 +1882,16 @@ function rotate(event) {
     }
 }
 
+/**
+ * Mirror on the X axis
+ * @param event
+ */
 function mirrorX(event) {
     event.preventDefault();
     if (inblock) return;
 
     if (initButton) {
-//Determina i CP simmetrici rispetto all'asse X per il proprio baricentro e ridisegna
+        //Determina i CP simmetrici rispetto all'asse X per il proprio baricentro e ridisegna
         let active = project.active_path;
         for (let k = 0; k < project.paths.length; k++) {
             if (!transform_multilayer && project.paths[k].id !== project.paths[active].id) {
@@ -1813,12 +1924,16 @@ function mirrorX(event) {
     }
 }
 
+/**
+ * Mirror on the Y axis
+ * @param event
+ */
 function mirrorY(event) {
     event.preventDefault();
     if (inblock) return;
 
     if (initButton) {
-//Determina i CP simmetrici rispetto all'asse Y per il proprio baricentro e ridisegna
+        //Determina i CP simmetrici rispetto all'asse Y per il proprio baricentro e ridisegna
         let active = project.active_path;
         for (let k = 0; k < project.paths.length; k++) {
             if (!transform_multilayer && project.paths[k].id !== project.paths[active].id) {
@@ -1851,6 +1966,10 @@ function mirrorY(event) {
     }
 }
 
+/**
+ * Converts a curve to a non-periodic version
+ * @param event
+ */
 function periodToNoperiod(event) {
     event.preventDefault();
     if (inblock) return;
@@ -1891,8 +2010,11 @@ function periodToNoperiod(event) {
     }
 }
 
-//GC 15/11/22
-//questa nuova function permette di aprire una curva chiusa C^0
+/**
+ * Opens up a curve
+ * @param event
+ * @constructor
+ */
 function OpenCurve(event) {
     event.preventDefault();
     if (inblock) return;
@@ -1931,8 +2053,11 @@ function OpenCurve(event) {
     }
 }
 
-//questa function è la opposta della precedente, ossia presa
-//una curva aperta (period=-1) la chiude aggiungendo un tratto lineare
+/**
+ * Closes a curve with a straight line
+ * @param event
+ * @constructor
+ */
 function CloseCurve(event) {
     event.preventDefault();
     if (inblock) return;
