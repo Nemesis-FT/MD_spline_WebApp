@@ -1148,6 +1148,15 @@ function svg_loadFile(event) {
         console.debug(data)
         project.viewbox = data
         selectPath(0, false, false)
+        let input = document.getElementById("paths_render")
+        input.value = "*"
+        if(fill===false){
+            toggleFill(event)
+        }
+
+
+        setPathRenderList()
+
         //mirrorX(event)
     }
     reader.readAsText(event.target.files[0])
