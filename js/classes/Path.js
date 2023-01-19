@@ -26,13 +26,13 @@ class Path{
         if(!svgSource){
             return
         }
-        if(svgSource.getAttribute("stroke")){
+        if(svgSource.getAttribute("stroke") && svgSource.getAttribute("stroke")!=="null"){
             this.strokeColor = colorConverter(svgSource.getAttribute("stroke"))
         }
         else{
-            this.strokeColor = "#000000"
+            this.strokeColor = "#00000000"
         }
-        if(svgSource.getAttribute("fill")) {
+        if(svgSource.getAttribute("fill") && svgSource.getAttribute("fill")!=="null") {
             this.fillColor = colorConverter(svgSource.getAttribute("fill"))
         }
         else{
