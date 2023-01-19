@@ -76,9 +76,6 @@ class Project{
         } catch (e) {
 
         }
-        this.selectPath(id)
-        let current = document.getElementById("current_path")
-        current.innerText = "Current path is #"+(id).toString();
     }
 
     async createSVG(paths_dataset) {

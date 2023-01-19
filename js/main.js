@@ -227,7 +227,7 @@ function selectPath(id, nosave = false, dontdraw = false) {
         strokeColorInput.value = "#000000"
     }
     if(project.paths[project.active_path].fillColor){
-        strokeColorInput.value = project.paths[project.active_path].fillColor.slice(0,7)
+        fillColorInput.value = project.paths[project.active_path].fillColor.slice(0,7)
     }
     else{
         fillColorInput.value = "#000000"
@@ -249,11 +249,17 @@ function selectPath(id, nosave = false, dontdraw = false) {
 function movePathUp(id) {
     project.switchPath(id, true)
     project.createPathHtml("pathList")
+    selectPath(id, true, false)
+    let current = document.getElementById("current_path")
+    current.innerText = "Current path is #"+(id).toString();
 }
 
 function movePathDown(id) {
     project.switchPath(id, false)
     project.createPathHtml("pathList")
+    selectPath(id, true, false)
+    let current = document.getElementById("current_path")
+    current.innerText = "Current path is #"+(id).toString();
 }
 
 function setPathRenderList() {

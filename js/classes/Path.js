@@ -62,12 +62,12 @@ class Path{
         let button2 = document.createElement("button")
         button2.className="btn btn-info";
         button2.setAttribute("onclick", "movePathUp("+(this.id).toString()+")")
-        button2.innerText = "Move up";
+        button2.innerText = "Move down";
         element.append(button2)
         let button3 = document.createElement("button")
         button3.className="btn btn-info";
         button3.setAttribute("onclick", "movePathDown("+(this.id).toString()+")")
-        button3.innerText = "Move down";
+        button3.innerText = "Move up";
         element.append(button3)
     }
 }
