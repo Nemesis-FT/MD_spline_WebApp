@@ -220,8 +220,18 @@ function selectPath(id, nosave = false, dontdraw = false) {
     IDelement = project.paths[project.active_path].IDelement
     fl = project.paths[project.active_path].fl
     bs = project.paths[project.active_path].bs
-    strokeColorInput.value = project.paths[project.active_path].strokeColor
-    fillColorInput.value = project.paths[project.active_path].fillColor
+    if(project.paths[project.active_path].strokeColor){
+        strokeColorInput.value = project.paths[project.active_path].strokeColor.slice(0,7)
+    }
+    else{
+        strokeColorInput.value = "#000000"
+    }
+    if(project.paths[project.active_path].fillColor){
+        strokeColorInput.value = project.paths[project.active_path].fillColor.slice(0,7)
+    }
+    else{
+        fillColorInput.value = "#000000"
+    }
 
 
     //Draw della curva caricata
@@ -490,6 +500,7 @@ function mouseMoveFunction(e) {
                 redraw1(pointShape, controlPoint, period, project.paths[project.active_path].strokeColor, project.paths[project.active_path].fillColor);
             }
             ctx.fillStyle = "#000000"
+            ctx.strokeStyle = "#000000"
             ctx.rect(zoomBox.x.start, zoomBox.y.start, zoomBox.x.end - zoomBox.x.start, zoomBox.y.end - zoomBox.y.start)
             ctx.stroke()
             let zoombutton = document.getElementById("areaZoomButton")
