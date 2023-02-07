@@ -522,7 +522,7 @@ function mouseMoveFunction(e) {
         if (initButton) {
             IDlinePoint = intersect(e, pointShape);
             if (renderList.length !== 0) {
-                multipleRender()
+                //multipleRender()
             } else if (IDlinePoint !== -1) {
                 redraw2(pointShape, controlPoint, IDlinePoint, paramd.continuity[paramd.indicePrimoBreakPoint], project.paths[project.active_path].strokeColor, project.paths[project.active_path].fillColor);
             }
@@ -1567,17 +1567,20 @@ function zoom(event, dontclear = false) {
                 arrayX.push(controlPoint[i].x);
                 arrayY.push(controlPoint[i].y);
             }
-        }
-        wxmin = _.min(arrayX);
-        wymin = _.min(arrayY);
-        wxmax = _.max(arrayX);
-        wymax = _.max(arrayY);
-
-        for (let k = 0; k < project.paths.length; k++) {
+            wxmin = _.min(arrayX);
+            wymin = _.min(arrayY);
+            wxmax = _.max(arrayX);
+            wymax = _.max(arrayY);
             selectPath(project.paths[k].id, false, true)
             zoom_view(pointShape, controlPoint, 0);
             var period = paramd.continuity[paramd.indicePrimoBreakPoint];
             redraw1(pointShape, controlPoint, period, !dontclear, project.paths[project.active_path].strokeColor, project.paths[project.active_path].fillColor);
+        }
+
+
+
+        for (let k = 0; k < project.paths.length; k++) {
+
         }
         selectPath(project.paths[active].id, false, true)
     }

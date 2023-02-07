@@ -1,0 +1,311 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+</head>
+
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <h1 style="text-align: center">C1 MD-Spline Demo v2.0</h1>
+        <h5 style="text-align: center">This Web App requires Chrome</h5>
+        <hr/>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <p>
+                <button id="clearCanvas" type="button" class="btn btn-primary" name="button">
+                    Clean
+                </button>
+                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#exampleModalLong">
+                    Info
+                </button>
+                <button type="button" class="btn btn-danger" onclick="md_saveFile(event)">
+                    Save md
+                </button>
+                <button type="button" class="btn btn-danger" onclick="svg_saveFile(event)">
+                    Save path
+                </button>
+                <button type="button" class="btn btn-warning" disabled onclick="zoom(event)">
+                    ZoomToFit
+                </button>
+                <button type="button" class="btn btn-warning" onclick="zoomArea(event)">
+                    ZoomOnSelection
+                </button>
+                <button type="button" class="btn btn-warning" onclick="panfun(event)">
+                    Pan
+                </button>
+                <button type="button" class="btn btn-warning" onclick="gridfun(event)">
+                    Grid
+                </button>
+                <button type="button" class="btn btn-light" onclick="drawMDBS(event)">
+                    DrawMD-BS
+                </button>
+                <button type="button" class="btn btn-light" onclick="drawOnlyCurve(event)">
+                    Toggle CPs
+                </button>
+                <button type="button" class="btn btn-light" onclick="toggleFill(event)">
+                    FillCurve
+                </button>
+                <button type="button" class="btn btn-primary" onclick="upapprox(event)">
+                    UPApprox
+                </button>
+                <button type="button" class="btn btn-primary" onclick="periodToNoperiod(event)">
+                    ConvToNoPrdic
+                </button>
+                <button type="button" class="btn btn-primary" onclick="OpenCurve(event)">
+                    OpenC0Curve
+                </button>
+                <button type="button" class="btn btn-primary" onclick="CloseCurve(event)">
+                    CloseCurve
+                </button>
+                <button type="button" class="btn btn-success" onclick="rotate(event)">
+                    90Rotate
+                </button>
+                <button type="button" class="btn btn-success" onclick="mirrorX(event)">
+                    XMirror
+                </button>
+                <button type="button" class="btn btn-success" onclick="mirrorY(event)">
+                    YMirror
+                </button>
+                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#exampleAbout">
+                    About
+                </button>
+            </p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <form class="form-inline">
+                <label for="inlineFormInput">Degree</label>
+                <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="degree" value=3>
+                <label for="continuity">Continuity</label>
+                <input type="text" class="form-control" id="continuity" value=2 disabled>
+            </form>
+            <form class="form-inline">
+                <div class="form-check">
+                    <label>Is Closed</label>
+
+                    <input class="form-check-input" type="radio" name="isClosed" value="false" checked> false
+
+                    <input class="form-check-input" type="radio" name="isClosed" value="true"> true
+                    <label for="multipath_transforms">Transform on all layers</label>
+                    <input type="checkbox" class="form-check-input" name="multipath_transforms_switch" id="multipath_transforms" checked onchange="transform_switch()">
+                    <br>
+
+                    <span id="periodicContinuity">
+                            <label for="continuityValue">Periodic continuity</label>
+                            <input type="text" class="form-control" id="continuityValue" value=-1 disabled/>
+                        </span>
+                    <br><br>
+                    <label for="inlineFormInput">Eval.Points for Span</label>
+                    <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="npoint" value=21>
+                    <br><br>
+                    <label for="inlineFormInput">Grid-Res.</label>
+                    <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="gridR" value=20>
+                </div>
+            </form>
+            <div class="col-md-6">
+                <div>
+                    <form class="form-inline">
+                        <div class="form-group">
+                            <label for="gc">Load md-file</label>
+                            <input id='input1' type='file' onchange="md_openFile(event)"/>
+                        </div>
+                    </form>
+
+                    <form class="form-inline">
+                        <div class="form-group">
+                            <label for="gc">Load SVG-path-file</label>
+                            <input id='input2' type='file' onchange="svg_loadFile(event)"/>
+                        </div>
+                    </form>
+                </div>
+                <form>
+                    <div class="form-group">
+                        <label for="strokeCol">Stroke Color</label>
+                        <input type="color" class="form-control mb-2 mr-sm-2 mb-sm-0" id="strokeCol" value="#ff0000" onchange="setStrokeColor(event)">
+                        <label for="fillCol">Fill Color</label>
+                        <input type="color" class="form-control mb-2 mr-sm-2 mb-sm-0" id="fillCol" value="#ffffff" onchange="setFillColor(event)">
+                    </div>
+                </form>
+                <button type="button" class="btn btn-info" onclick="showInfoToggle(event)">
+                    Show/Hide Shape info
+                </button>
+
+                <div id="infoShape" style="display: none"></div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <canvas id="canvas" width="800" height="400" style="background-color:#ddd;"></canvas>
+            <div id="modalBody"></div>
+            <br>
+            <div id="pathSelectorSection">
+                <label for="pathSelectorWidget">Paths</label>
+                <div id="pathSelectorWidget" style="overflow-y: auto; height: 200px; margin-bottom: 10px">
+                    <ul class="list-group" id="pathList">
+                    </ul>
+                </div>
+                <button type="button" class="btn btn-success" onclick="addPath()">
+                    Add Path
+                </button>
+                <button type="button" class="btn btn-warning" onclick="removePath()">
+                    Delete current path
+                </button>
+                <p id="current_path">
+
+                </p>
+                <form class="form-inline">
+                    <label for="continuity">Render following paths:</label>
+                    <input type="text" class="form-control" id="paths_render">
+                    <button type="button" class="btn btn-success" onclick="setPathRenderList()">
+                        Run
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+    <div hidden>
+        <svg>
+            <path id="pathbuffer" d="">
+
+            </path>
+        </svg>
+    </div>
+
+</div>
+<div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="exampleModalLongTitle">How to use C1 MD-Spline Demo</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="text-center">
+
+                        <img src="mouse.jpg" alt="" style="height: 200px">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>To start from scratch</label>
+                        <ul>
+                            <li>Left click on the canvas to set the spline curve control points (CPs);</li>
+                            <li>Right click to end</li>
+                        </ul>
+                        <label>To start from file</label>
+                        <ul>
+                            <li>Load md file</li>
+                            <li>Load SVG path file</li>
+                        </ul>
+                        <label>Then try to model</label>
+                    </div>
+                    <div class="col-md-6">
+                        <label>Left button</label>
+                        <ul>
+                            <li>drag black circle to move a CP</li>
+                        </ul>
+
+                    </div>
+                    <div class="col-md-6">
+                        <label>Right button</label>
+                        <ul>
+                            <li> click on white/red circle to select a break-point</li>
+                            <li> click on yellow circle to select a segment</li>
+                        </ul>
+                        <label>Move the mouse button on the canvas to redraw</label>
+                        <label>Use the mouse wheel to zoom</label>
+                    </div>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+<div class="modal fade" id="exampleAbout" tabindex="-1" role="dialog" aria-labelledby="exampleAboutTitle">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="exampleAboutTitle">About</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <center> This Web App was restructured so as</center>
+                    <center> to improve operation without altering functionality by</center>
+                    <center><label>Giulio Casciola</label></center>
+                    <center> It uses only JavaScript, HTML5 and CSS3</center>
+                    <center> No WebGL frameworks were adopted</center>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <script type="text/javascript" src="js/lib/jquery.min.js"></script>
+    <script type="text/javascript" src="js/lib/bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/lib/lodash.min.js"></script>
+    <script type="text/javascript" src="js/classes/Path.js"></script>
+    <script type="text/javascript" src="js/classes/Project.js"></script>
+    <script type="text/javascript" src="js/lib/FileSaver.js"></script>
+    <script type="text/javascript" src="js/lib/math.js"></script>
+    <script type="text/javascript" src="js/utils/mousewheel.js"></script>
+    <script type="text/javascript" src="js/utils/appendInfo.js"></script>
+    <script type="text/javascript" src="js/utils/computation/calculateMatrixControl.js"></script>
+    <script type="text/javascript" src="js/utils/computation/findInt.js"></script>
+    <script type="text/javascript" src="js/utils/computation/findSupport.js"></script>
+    <script type="text/javascript" src="js/utils/computation/gc_mesh_new.js"></script>
+    <script type="text/javascript" src="js/utils/computation/findInx.js"></script>
+    <script type="text/javascript" src="js/utils/computation/gc_period.js"></script>
+    <script type="text/javascript" src="js/utils/computation/scaled_param.js"></script>
+    <script type="text/javascript" src="js/utils/computation/define_MDspl_space.js"></script>
+    <script type="text/javascript" src="js/utils/computation/gc_MDbspl_valder.js"></script>
+    <script type="text/javascript" src="js/utils/computation/mainVD_MDspl_new.js"></script>
+    <script type="text/javascript" src="js/utils/getMousePos.js"></script>
+    <script type="text/javascript" src="js/utils/intersect.js"></script>
+    <script type="text/javascript" src="js/utils/utilsDraw/createPoint.js"></script>
+    <script type="text/javascript" src="js/utils/utilsDraw/redraw.js"></script>
+    <script type="text/javascript" src="js/utils/utilsEvent/eventChange.js"></script>
+    <script type="text/javascript" src="js/utils/colorConverter.js"></script>
+    <!--
+            <script type="text/javascript" src="js/utils/appendDegreeContinuity.js"></script>
+    -->
+    <script type="text/javascript" src="js/utils/utilsEvent/clean.js"></script>
+    <script type="text/javascript" src="js/utils/computation/gc_pol_de2d.js"></script>
+    <script type="text/javascript" src="js/utils/computation/num_gc_knotins2d.js"></script>
+    <script type="text/javascript" src="js/utils/computation/num_gc_knotins2d_period.js"></script>
+    <script type="text/javascript" src="js/utils/computation/num_gc_knotins2d_period_new.js"></script>
+    <script type="text/javascript" src="js/utils/computation/num_gc_pol_de2d.js"></script>
+    <script type="text/javascript" src="js/utils/computation/num_gc_pol_de2d_period.js"></script>
+    <script type="text/javascript" src="js/utils/computation/num_gc_degreered2d.js"></script>
+    <script type="text/javascript" src="js/utils/computation/num_gc_degreered2d_period.js"></script>
+    <script type="text/javascript" src="js/utils/computation/num_gc_approx2d.js"></script>
+    <script type="text/javascript" src="js/utils/computation/num_gc_knotrem2d.js"></script>
+    <script type="text/javascript" src="js/utils/computation/num_gc_knotrem2d_period.js"></script>
+    <script type="text/javascript" src="js/utils/computation/zeros.js"></script>
+    <script type="text/javascript" src="js/utils/computation/dual_alg2.js"></script>
+    <script type="text/javascript" src="js/utils/computation/dual_alg1.js"></script>
+    <script type="text/javascript" src="js/utils/computation/partizioniNodali.js"></script>
+    <script type="text/javascript" src="js/utils/computation/dual_inner_prod.js"></script>
+    <script type="text/javascript" src="js/main.js"></script>
+    <script type="text/javascript" src="js/utils/appendOption.js"></script>
+    <script type="text/javascript" src="js/utils/computation/compute_MDspline.js"></script>
+
+    <script src="js/utils/path-data-polyfill.js"></script>
+</footer>
+
+</body>
+
+</html>

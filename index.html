@@ -1,162 +1,130 @@
 <html>
 
 <head>
-    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/css/bootstrap.min.css">
 </head>
 
 <body>
-<div class="container-fluid">
-    <div class="row">
-        <h1 style="text-align: center">C1 MD-Spline Demo v2.0</h1>
-        <h5 style="text-align: center">This Web App requires Chrome</h5>
-        <hr/>
-    </div>
-    <div class="row">
-        <div class="col-md-6">
-            <p>
-                <button id="clearCanvas" type="button" class="btn btn-primary" name="button">
-                    Clean
-                </button>
-                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#exampleModalLong">
-                    Info
-                </button>
-                <button type="button" class="btn btn-danger" onclick="md_saveFile(event)">
-                    Save md
-                </button>
-                <button type="button" class="btn btn-danger" onclick="svg_saveFile(event)">
-                    Save path
-                </button>
-                <button type="button" class="btn btn-warning" disabled onclick="zoom(event)">
-                    ZoomToFit
-                </button>
-                <button type="button" class="btn btn-warning" onclick="zoomArea(event)">
-                    ZoomOnSelection
-                </button>
-                <button type="button" class="btn btn-warning" onclick="panfun(event)">
-                    Pan
-                </button>
-                <button type="button" class="btn btn-warning" onclick="gridfun(event)">
-                    Grid
-                </button>
-                <button type="button" class="btn btn-light" onclick="drawMDBS(event)">
-                    DrawMD-BS
-                </button>
-                <button type="button" class="btn btn-light" onclick="drawOnlyCurve(event)">
-                    Toggle CPs
-                </button>
-                <button type="button" class="btn btn-light" onclick="toggleFill(event)">
-                    FillCurve
-                </button>
-                <button type="button" class="btn btn-primary" onclick="upapprox(event)">
-                    UPApprox
-                </button>
-                <button type="button" class="btn btn-primary" onclick="periodToNoperiod(event)">
-                    ConvToNoPrdic
-                </button>
-                <button type="button" class="btn btn-primary" onclick="OpenCurve(event)">
-                    OpenC0Curve
-                </button>
-                <button type="button" class="btn btn-primary" onclick="CloseCurve(event)">
-                    CloseCurve
-                </button>
-                <button type="button" class="btn btn-success" onclick="rotate(event)">
-                    90Rotate
-                </button>
-                <button type="button" class="btn btn-success" onclick="mirrorX(event)">
-                    XMirror
-                </button>
-                <button type="button" class="btn btn-success" onclick="mirrorY(event)">
-                    YMirror
-                </button>
-                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#exampleAbout">
-                    About
-                </button>
-            </p>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-md-6">
-            <form class="form-inline">
-                <label for="inlineFormInput">Degree</label>
-                <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="degree" value=3>
-                <label for="continuity">Continuity</label>
-                <input type="text" class="form-control" id="continuity" value=2 disabled>
-            </form>
-            <form class="form-inline">
-                <div class="form-check">
-                    <label>Is Closed</label>
-
-                    <input class="form-check-input" type="radio" name="isClosed" value="false" checked> false
-
-                    <input class="form-check-input" type="radio" name="isClosed" value="true"> true
-                    <label for="multipath_transforms">Transform on all layers</label>
-                    <input type="checkbox" class="form-check-input" name="multipath_transforms_switch" id="multipath_transforms" checked onchange="transform_switch()">
-                    <br>
-
-                    <span id="periodicContinuity">
-                            <label for="continuityValue">Periodic continuity</label>
-                            <input type="text" class="form-control" id="continuityValue" value=-1 disabled/>
-                        </span>
-                    <br><br>
-                    <label for="inlineFormInput">Eval.Points for Span</label>
-                    <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="npoint" value=21>
-                    <br><br>
-                    <label for="inlineFormInput">Grid-Res.</label>
-                    <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="gridR" value=20>
-                </div>
-            </form>
-            <div class="col-md-6">
-                <div>
-                    <form class="form-inline">
-                        <div class="form-group">
-                            <label for="gc">Load md-file</label>
-                            <input id='input1' type='file' onchange="md_openFile(event)"/>
-                        </div>
-                    </form>
-
-                    <form class="form-inline">
-                        <div class="form-group">
-                            <label for="gc">Load SVG-path-file</label>
-                            <input id='input2' type='file' onchange="svg_loadFile(event)"/>
-                        </div>
-                    </form>
-                </div>
-                <form>
-                    <div class="form-group">
-                        <label for="strokeCol">Stroke Color</label>
-                        <input type="color" class="form-control mb-2 mr-sm-2 mb-sm-0" id="strokeCol" value="#ff0000" onchange="setStrokeColor(event)">
-                        <label for="fillCol">Fill Color</label>
-                        <input type="color" class="form-control mb-2 mr-sm-2 mb-sm-0" id="fillCol" value="#ffffff" onchange="setFillColor(event)">
-                    </div>
-                </form>
-                <button type="button" class="btn btn-info" onclick="showInfoToggle(event)">
-                    Show/Hide Shape info
-                </button>
-
-                <div id="infoShape" style="display: none"></div>
-            </div>
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">C1 MD-Spline Demo v2.0</a>
         </div>
 
-        <div class="col-md-6">
-            <canvas id="canvas" width="800" height="400" style="background-color:#ddd;"></canvas>
-            <div id="modalBody"></div>
-            <br>
-            <div id="pathSelectorSection">
-                <label for="pathSelectorWidget">Paths</label>
-                <div id="pathSelectorWidget" style="overflow-y: auto; height: 200px; margin-bottom: 10px">
-                    <ul class="list-group" id="pathList">
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false">File<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#" onclick="location.reload()">New</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#" onclick="dropdown_load_md()">Load from .md</a></li>
+                        <li><a href="#" onclick="dropdown_load_svg()">Load from .svg</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#" onclick="md_saveFile(event)">Save to .md</a></li>
+                        <li><a href="#" onclick="svg_saveFile(event)">Save to .svg</a></li>
                     </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false">View<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#" onclick="gridfun(event)">Toggle grid</a></li>
+                        <li><a href="#" onclick="toggleFill(event)">Toggle filling</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#" onclick="drawOnlyCurve(event)">Toggle CPs</a></li>
+                        <li><a href="#" onclick="drawMDBS(event)">DrawMD-BS</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false">Tools<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#" onclick="upapprox(event)">UPApprox</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#" onclick="periodToNoperiod(event)">Convert to non-periodic</a></li>
+                        <li><a href="#" onclick="OpenCurve(event)">Open curve</a></li>
+                        <li><a href="#" onclick="CloseCurve(event)">Close curve</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false">Info<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#" data-toggle="modal" data-target="#exampleModalLong">How to use this app</a></li>
+                        <li><a href="#" data-toggle="modal" data-target="#exampleAbout">About this app</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <div style="display: flex; flex-direction: row; height: 90%">
+        <div style="width: 5%; display: flex; flex-direction: column; border-style: inset;">
+            <button type="button" class="btn btn-success" onclick="zoom(event)">
+                <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
+            </button>
+            <button type="button" id="areaZoomButton" class="btn btn-success" onclick="zoomArea(event)">
+                <span class="glyphicon glyphicon-screenshot" aria-hidden="true"></span>
+            </button>
+            <button type="button" id="panButton" class="btn btn-success" onclick="panfun(event)">
+                <span class="glyphicon glyphicon-hand-up" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="btn btn-success" onclick="rotate(event)">
+                <span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="btn btn-success" onclick="mirrorX(event)">
+                <span class="glyphicon glyphicon-resize-vertical" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="btn btn-success" onclick="mirrorY(event)">
+                <span class="glyphicon glyphicon-resize-horizontal" aria-hidden="true"></span>
+            </button>
+            <form>
+                <div class="form-group">
+                    <label for="strokeCol">Border</label>
+                    <input type="color" class="form-control mb-2 mr-sm-2 mb-sm-0" id="strokeCol" value="#ff0000"
+                           onchange="setStrokeColor(event)">
+                    <label for="fillCol">Fill</label>
+                    <input type="color" class="form-control mb-2 mr-sm-2 mb-sm-0" id="fillCol" value="#ffffff"
+                           onchange="setFillColor(event)">
                 </div>
-                <button type="button" class="btn btn-success" onclick="addPath()">
-                    Add Path
-                </button>
-                <button type="button" class="btn btn-warning" onclick="removePath()">
-                    Delete current path
-                </button>
+            </form>
+        </div>
+        <div style="width: 70%">
+            <canvas id="canvas" style="background-color:#ddd; flex:1 1 auto;"></canvas>
+        </div>
+        <div style="width: 23%; border-style: inset; overflow-y: scroll; padding-left: 10px; padding-top: 10px; padding-right: 10px">
+            <!-- Path/Details zone -->
+            <div id="pathSelectorSection">
+                <div>
+                    <button type="button" class="btn btn-success" onclick="addPath()">
+                        Add Path
+                    </button>
+                    <button type="button" class="btn btn-warning" onclick="removePath()">
+                        Delete current path
+                    </button>
+
+                </div>
                 <p id="current_path">
 
                 </p>
+                <label for="pathSelectorWidget">Paths</label>
+                <div id="pathSelectorWidget" style="overflow-y: scroll; height: 50%; margin-bottom: 10px">
+                    <ul class="list-group" id="pathList">
+                    </ul>
+                </div>
+
+
                 <form class="form-inline">
                     <label for="continuity">Render following paths:</label>
                     <input type="text" class="form-control" id="paths_render">
@@ -165,8 +133,39 @@
                     </button>
                 </form>
             </div>
-        </div>
+            <div id="modalBody"></div>
+            <div>
+                <form>
+                    <label for="degree">Degree</label>
+                    <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="degree" value=3>
+                    <label for="continuity">Continuity</label>
+                    <input type="text" class="form-control" id="continuity" value=2 disabled>
+                </form>
+                <form>
+                    <div class="form-check">
+                        <label for="closed">Is Closed</label>
+                        <div id="closed">
+                            <input class="form-check-input" type="radio" name="isClosed" value="false" checked> false
+                            <input class="form-check-input" type="radio" name="isClosed" value="true"> true
+                        </div>
+                        <label for="multipath_transforms">Transform on all layers</label>
+                        <input type="checkbox" class="form-check-input" name="multipath_transforms_switch"
+                               id="multipath_transforms" checked onchange="transform_switch()">
+                        <br>
+                        <span id="periodicContinuity">
+                        <label for="continuityValue">Periodic continuity</label>
+                        <input type="text" class="form-control" id="continuityValue" value=-1 disabled/>
+                        </span>
+                        <label for="npoint">Eval.Points for Span</label>
+                        <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="npoint" value=21>
+                        <label for="gridR">Grid-Res.</label>
+                        <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="gridR" value=20>
 
+                    </div>
+                </form>
+            </div>
+            <div id="infoShape"></div>
+        </div>
     </div>
     <div hidden>
         <svg>
@@ -176,59 +175,58 @@
         </svg>
     </div>
 
-</div>
-<div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title" id="exampleModalLongTitle">How to use C1 MD-Spline Demo</h4>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="text-center">
+    <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="exampleModalLongTitle">How to use C1 MD-Spline Demo</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="text-center">
 
-                        <img src="mouse.jpg" alt="" style="height: 200px">
+                            <img src="mouse.jpg" alt="" style="height: 200px">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label>To start from scratch</label>
+                            <ul>
+                                <li>Left click on the canvas to set the spline curve control points (CPs);</li>
+                                <li>Right click to end</li>
+                            </ul>
+                            <label>To start from file</label>
+                            <ul>
+                                <li>Load md file</li>
+                                <li>Load SVG path file</li>
+                            </ul>
+                            <label>Then try to model</label>
+                        </div>
+                        <div class="col-md-6">
+                            <label>Left button</label>
+                            <ul>
+                                <li>drag black circle to move a CP</li>
+                            </ul>
+
+                        </div>
+                        <div class="col-md-6">
+                            <label>Right button</label>
+                            <ul>
+                                <li> click on white/red circle to select a break-point</li>
+                                <li> click on yellow circle to select a segment</li>
+                            </ul>
+                            <label>Move the mouse button on the canvas to redraw</label>
+                            <label>Use the mouse wheel to zoom</label>
+                        </div>
+
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <label>To start from scratch</label>
-                        <ul>
-                            <li>Left click on the canvas to set the spline curve control points (CPs);</li>
-                            <li>Right click to end</li>
-                        </ul>
-                        <label>To start from file</label>
-                        <ul>
-                            <li>Load md file</li>
-                            <li>Load SVG path file</li>
-                        </ul>
-                        <label>Then try to model</label>
-                    </div>
-                    <div class="col-md-6">
-                        <label>Left button</label>
-                        <ul>
-                            <li>drag black circle to move a CP</li>
-                        </ul>
-
-                    </div>
-                    <div class="col-md-6">
-                        <label>Right button</label>
-                        <ul>
-                            <li> click on white/red circle to select a break-point</li>
-                            <li> click on yellow circle to select a segment</li>
-                        </ul>
-                        <label>Move the mouse button on the canvas to redraw</label>
-                        <label>Use the mouse wheel to zoom</label>
-                    </div>
-
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
-</div>
 
 </div>
 <div class="modal fade" id="exampleAbout" tabindex="-1" role="dialog" aria-labelledby="exampleAboutTitle">
@@ -251,9 +249,35 @@
             </div>
         </div>
     </div>
+    <div hidden>
+        <form class="form-inline">
+            <div class="form-group">
+                <input id='input1' type='file' onchange="md_openFile(event)"/>
+            </div>
+        </form>
+
+        <form class="form-inline">
+            <div class="form-group">
+                <input id='input2' type='file' onchange="svg_loadFile(event)"/>
+            </div>
+        </form>
+    </div>
 </div>
 
+
 <footer>
+    <script>
+        input_svg = document.getElementById("input2")
+        input_md = document.getElementById("input1")
+
+        function dropdown_load_svg() {
+            input_svg.click()
+        }
+
+        function dropdown_load_md() {
+            input_md.click()
+        }
+    </script>
     <script type="text/javascript" src="js/lib/jquery.min.js"></script>
     <script type="text/javascript" src="js/lib/bootstrap.min.js"></script>
     <script type="text/javascript" src="js/lib/lodash.min.js"></script>
