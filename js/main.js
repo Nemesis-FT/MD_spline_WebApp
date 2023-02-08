@@ -18,13 +18,14 @@ var param = {
     indiciPartizioneNodaleS: []
 }
 
-
+let active_path = 0
 var NUMBER_POINT = Number($('#npoint').val());
 var paramd;
 var canvas = document.getElementById('canvas');
 let project = new Project()
 
 function resize() {
+
     let parent = canvas.parentNode
     let styles = getComputedStyle(parent)
     let w = parseInt(styles.getPropertyValue("width"), 10)
@@ -32,11 +33,21 @@ function resize() {
     canvas.width = w - 10
     canvas.height = h
     if (project.paths.length === 0) {
-        return
+
     }
-    redraw6(pointShape, controlPoint, paramd.continuity[paramd.indicePrimoBreakPoint], project.paths[project.active_path].strokeColor, project.paths[project.active_path].fillColor);
-    if (renderList.length !== 0) {
-        multipleRender()
+    else{
+        try{
+            redraw6(pointShape, controlPoint, paramd.continuity[paramd.indicePrimoBreakPoint], project.paths[project.active_path].strokeColor, project.paths[project.active_path].fillColor);
+        }
+        catch (e) {
+            
+        }
+        if (renderList.length !== 0) {
+            multipleRender()
+        }
+        if(grid_flag){
+            gridfun(new Event("test"), true)
+        }
     }
 }
 
@@ -240,6 +251,9 @@ function selectPath(id, nosave = false, dontdraw = false) {
     IDelement = project.paths[project.active_path].IDelement
     fl = project.paths[project.active_path].fl
     bs = project.paths[project.active_path].bs
+    if(!nosave){
+        active_path = project.active_path
+    }
     if (project.paths[project.active_path].strokeColor) {
         strokeColorInput.value = project.paths[project.active_path].strokeColor.slice(0, 7)
     } else {
@@ -254,6 +268,7 @@ function selectPath(id, nosave = false, dontdraw = false) {
 
     //Draw of the curves
     if (!dontdraw) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         multipleRender()
     }
     // Update paths info
@@ -301,46 +316,48 @@ function setPathRenderList() {
         for (let i = 0; i < project.paths.length; i++) {
             ids.push(project.paths[i].id)
         }
-        renderList = ids
-        return;
     }
-    let ids_str = input.value.split(",")
-    for (let i = 0; i < ids_str.length; i++) {
-        try {
-            let id = parseInt(ids_str[i])
-            ids.push(id)
-            if (!project.pathExists(id)) {
-                alert("Path id " + id + " does not exist.")
+    else{
+        let ids_str = input.value.split(",")
+        for (let i = 0; i < ids_str.length; i++) {
+            try {
+                let id = parseInt(ids_str[i])
+                ids.push(id)
+                if (!project.pathExists(id)) {
+                    alert("Path id " + id + " does not exist.")
+                    return;
+                }
+            } catch (e) {
+                alert("Input is not valid.")
                 return;
             }
-        } catch (e) {
-            alert("Input is not valid.")
-            return;
         }
     }
     renderList = ids;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     multipleRender();
 }
 
 /**
  * Render multiple paths in a single go
  */
-function multipleRender() {
+function multipleRender(ignore_active=false) {
     let active_path = project.paths[project.active_path]
     let active = project.active_path
     //ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (let i = 0; i < project.paths.length; i++) {
-        if (renderList.includes(project.paths[i].id)) {
+        ctx.strokeStyle = "black"
+        if (active === i && !ignore_active) {
+            selectPath(project.paths[i].id, false, true)
+            var period = paramd.continuity[paramd.indicePrimoBreakPoint];
+            redraw1(pointShape, controlPoint, period, false, project.paths[project.active_path].strokeColor, project.paths[project.active_path].fillColor);
+        }
+        else if (renderList.includes(project.paths[i].id)) {
             selectPath(project.paths[i].id, false, true)
             let e = new Event("", undefined);
-            if (active === i) {
-                var period = paramd.continuity[paramd.indicePrimoBreakPoint];
-                redraw1(pointShape, controlPoint, period, false, project.paths[project.active_path].strokeColor, project.paths[project.active_path].fillColor);
-            } else {
-                drawOnlyCurve(e, false);
-            }
-
+            drawOnlyCurve(e, false);
         }
+
     }
     selectPath(active_path.id, false, true)
 }
@@ -509,6 +526,8 @@ function panning(ipoint, isPoint = true, useOffsets = false) {
  */
 function toggleFill(e) {
     fill = !fill
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    multipleRender();
 }
 
 /**
@@ -521,10 +540,11 @@ function mouseMoveFunction(e) {
     if (mode === "draw") {
         if (initButton) {
             IDlinePoint = intersect(e, pointShape);
-            if (renderList.length !== 0) {
-                //multipleRender()
-            } else if (IDlinePoint !== -1) {
+            if (IDlinePoint !== -1 && project.active_path == active_path) {
                 redraw2(pointShape, controlPoint, IDlinePoint, paramd.continuity[paramd.indicePrimoBreakPoint], project.paths[project.active_path].strokeColor, project.paths[project.active_path].fillColor);
+                if(renderList.length>0){
+                    multipleRender(true)
+                }
             }
 
         }
@@ -1496,15 +1516,27 @@ document.getElementById("canvas").onmousewheel = function (event) {
  * Draws a grid.
  * @param event
  */
-function gridfun(event) {
+function gridfun(event, notoggle=false) {
 
     event.preventDefault();
-    grid_flag = 1 - grid_flag;
+    if(!notoggle){
+        grid_flag = 1 - grid_flag;
+    }
+
+    gridx = []
+    gridy = []
+    vxmax = canvas.width - 10;
+    vxmin = 10;
+    vymax = canvas.height - 10;
+    vymin = 10;
     if (grid_flag == 1) {
         ngridy = Number($('#gridR').val());
-        ngridx = 2 * ngridy;
-        hx = (vxmax - vxmin + 20) / (ngridx - 1);
-        hy = (vymax - vymin + 20) / (ngridy - 1);
+        ratio = Math.abs(canvas.width/canvas.height)
+        console.debug(ratio)
+        ngridx = ngridy*1.5;
+        console.debug(Math.floor(ngridx), ngridy)
+        hx = (vxmax - vxmin + 20) / (ngridx-1);
+        hy = (vymax - vymin + 20) / (ngridy-1);
         for (var i = 0; i < ngridx; i++) {
             gridx[i] = vxmin - 10 + i * hx;
         }
@@ -1555,32 +1587,34 @@ function zoom(event, dontclear = false) {
     if (inblock) return;
 
     if (initButton) {
-
         let active = project.active_path
         var arrayX = [];
         var arrayY = [];
+
+        //selectPath(project.paths[k].id, false, true)
+        for (var i = 0; i < controlPoint.length; i++) {
+            arrayX.push(controlPoint[i].x);
+            arrayY.push(controlPoint[i].y);
+        }
+        wxmin = _.min(arrayX);
+        wymin = _.min(arrayY);
+        wxmax = _.max(arrayX);
+        wymax = _.max(arrayY);
+
+        let wxmin_back = wxmin
+        let wymin_back = wymin
+        let wxmax_back = wxmax
+        let wymax_back = wymax
+
         for (let k = 0; k < project.paths.length; k++) {
-
-            selectPath(project.paths[k].id, false, true)
-
-            for (var i = 0; i < controlPoint.length; i++) {
-                arrayX.push(controlPoint[i].x);
-                arrayY.push(controlPoint[i].y);
-            }
-            wxmin = _.min(arrayX);
-            wymin = _.min(arrayY);
-            wxmax = _.max(arrayX);
-            wymax = _.max(arrayY);
             selectPath(project.paths[k].id, false, true)
             zoom_view(pointShape, controlPoint, 0);
             var period = paramd.continuity[paramd.indicePrimoBreakPoint];
             redraw1(pointShape, controlPoint, period, !dontclear, project.paths[project.active_path].strokeColor, project.paths[project.active_path].fillColor);
-        }
-
-
-
-        for (let k = 0; k < project.paths.length; k++) {
-
+            wxmin=wxmin_back
+            wymin=wymin_back
+            wxmax=wxmax_back
+            wymax=wymax_back
         }
         selectPath(project.paths[active].id, false, true)
     }

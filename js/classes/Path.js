@@ -56,7 +56,7 @@ class Path{
         element.append(paragraph)
         let button = document.createElement("button")
         button.className="btn btn-success";
-        button.setAttribute("onclick", "selectPath("+(this.id).toString()+")")
+        button.setAttribute("onclick", "selectPath("+(this.id).toString()+",false, false)")
         button.innerText = "Select";
         element.append(button)
         let button2 = document.createElement("button")

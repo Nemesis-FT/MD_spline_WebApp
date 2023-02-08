@@ -38,7 +38,8 @@ function redraw1(calculatedPoint, controlPoint, period, clear=true, strokeColor,
 
 //redraw2  chiama createPoint sia sui CPs che sulla curva, ma in più
 //disegna anche il punto della curva più vicino alla posizione del mouse
-function redraw2(pointShape, controlPoint, idPoint, period, strokeColor, fillColor){
+function redraw2(pointShape, controlPoint, idPoint, period, strokeColor, fillColor, clear=true){
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     if(fill){
         fillPolygon(pointShape, fillColor);

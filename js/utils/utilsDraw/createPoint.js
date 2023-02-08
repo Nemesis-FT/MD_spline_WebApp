@@ -128,6 +128,7 @@ function create_grid(grid, color) {
        if (grid_flag == 1) {
             var nx = ngridx-1;
             var ny = ngridy-1;
+
             ctx.strokeStyle = 'grey'; // all css colors are accepted by this property
          
             ctx.beginPath();
