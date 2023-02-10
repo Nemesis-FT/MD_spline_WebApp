@@ -134,6 +134,7 @@ canvas.oncontextmenu = function (e) {
             inblock = true;
             appendOption(IDpointCurve, paramd);
             IDpointCurve = -1;
+            $("#cpModal").modal()
         }
         if (IDelement !== -1)
             IDelement = -1;
@@ -1212,6 +1213,12 @@ function svg_adaptor(path) {
 
 }
 
+// Toggle per chiusura modale del menu tasto sinistro
+$('#cpModal').on('hidden.bs.modal', function () {
+    inblock = false;
+    $('#modalBody').empty();
+});
+
 /**
  * Load a whole SVG file
  * @param event
@@ -1243,6 +1250,7 @@ function svg_loadFile(event) {
             toggleFill(event)
         }
         setPathRenderList()
+        zoom(event, false)
     }
     reader.readAsText(event.target.files[0])
 }
@@ -1882,6 +1890,8 @@ function upapprox(event) {
 
         var period = paramd.continuity[paramd.indicePrimoBreakPoint];
         pointShape = redraw(bs, fl, controlPoint, pointShape, period, project.paths[project.active_path].strokeColor, project.paths[project.active_path].fillColor);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        multipleRender()
         appendInfo(paramd);
     }
 }

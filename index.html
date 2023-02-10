@@ -15,7 +15,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#">C1 MD-Spline Demo v2.0</a>
+            <a class="navbar-brand" href="#">C1 MD-Spline Demo v3.0</a>
         </div>
 
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -133,7 +133,23 @@
                     </button>
                 </form>
             </div>
-            <div id="modalBody"></div>
+            <!-- QUI -->
+            <div class="modal fade" id="cpModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title" id="cpmodalTitle">Spline Continuity Editor</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div id="modalBody"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" hidden class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div>
                 <form>
                     <label for="degree">Degree</label>
@@ -240,8 +256,11 @@
                     <center> This Web App was restructured so as</center>
                     <center> to improve operation without altering functionality by</center>
                     <center><label>Giulio Casciola</label></center>
+                    <center>During an internship in 2023, this app was reworked <br> in an effort to improve its functionalities by</center>
+                    <center><label>Lorenzo Balugani</label></center>
+                    <hr>
                     <center> It uses only JavaScript, HTML5 and CSS3</center>
-                    <center> No WebGL frameworks were adopted</center>
+                    <center>No WebGL frameworks were adopted</center>
                 </div>
             </div>
             <div class="modal-footer">
