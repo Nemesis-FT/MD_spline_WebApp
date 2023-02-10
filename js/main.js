@@ -1578,6 +1578,25 @@ function calc_wminmax() {
     return {xmax: wxmax, xmin: wxmin, ymax: wymax, ymin: wymin}
 }
 
+function findBounds(points) {
+    var n = points.length
+    if(n === 0) {
+        return []
+    }
+    var d = points[0].length
+    var lo = points[0].slice()
+    var hi = points[0].slice()
+    for(var i=1; i<n; ++i) {
+        var p = points[i]
+        for(var j=0; j<d; ++j) {
+            var x = p[j]
+            lo[j] = Math.min(lo[j], x)
+            hi[j] = Math.max(hi[j], x)
+        }
+    }
+    return [lo, hi]
+}
+
 /**
  * Zoom function
  * @param event
@@ -1588,35 +1607,46 @@ function zoom(event, dontclear = false) {
 
     if (initButton) {
         let active = project.active_path
-        var arrayX = [];
-        var arrayY = [];
-
-        //selectPath(project.paths[k].id, false, true)
-        for (var i = 0; i < controlPoint.length; i++) {
-            arrayX.push(controlPoint[i].x);
-            arrayY.push(controlPoint[i].y);
+        let pts = []
+        for(let i=0; i<controlPoint.length; i++){
+            pts.push([controlPoint[i].x, controlPoint[i].y])
         }
-        wxmin = _.min(arrayX);
-        wymin = _.min(arrayY);
-        wxmax = _.max(arrayX);
-        wymax = _.max(arrayY);
+        // Bounding box calculation
+        let result = findBounds(pts)
 
-        let wxmin_back = wxmin
-        let wymin_back = wymin
-        let wxmax_back = wxmax
-        let wymax_back = wymax
+        console.debug(result)
 
-        for (let k = 0; k < project.paths.length; k++) {
-            selectPath(project.paths[k].id, false, true)
-            zoom_view(pointShape, controlPoint, 0);
-            var period = paramd.continuity[paramd.indicePrimoBreakPoint];
-            redraw1(pointShape, controlPoint, period, !dontclear, project.paths[project.active_path].strokeColor, project.paths[project.active_path].fillColor);
-            wxmin=wxmin_back
-            wymin=wymin_back
-            wxmax=wxmax_back
-            wymax=wymax_back
+        ctx.rect(result[0][0], result[0][1], result[1][0]-result[0][0], result[1][1]-result[0][1])
+        ctx.stroke()
+        zoomBox.x.start = result[0][0]
+        zoomBox.y.start = result[0][1]
+        zoomBox.x.end = result[1][0]
+        zoomBox.y.end = result[1][1]
+        if (zoomBox.x.end < zoomBox.x.start) {
+            var tmp = zoomBox.x.end
+            zoomBox.x.end = zoomBox.x.start
+            zoomBox.x.start = tmp
         }
-        selectPath(project.paths[active].id, false, true)
+        if (zoomBox.y.end < zoomBox.y.start) {
+            var tmp = zoomBox.y.end
+            zoomBox.y.end = zoomBox.y.start
+            zoomBox.y.start = tmp
+        }
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        panning({x: (zoomBox.x.end + zoomBox.x.start) / 2, y: (zoomBox.y.end + zoomBox.y.start) / 2}, false, false)
+        zoom_selection()
+        console.debug(zoomBox)
+        var oldId = IDelement
+
+        var period = paramd.continuity[paramd.indicePrimoBreakPoint];
+
+        if (renderList.length !== 0) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            multipleRender()
+        } else {
+            redraw1(pointShape, controlPoint, period, project.paths[project.active_path].strokeColor, project.paths[project.active_path].fillColor);
+        }
+
     }
 }
 
