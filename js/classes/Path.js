@@ -23,8 +23,11 @@ class Path{
         this.fl = []
         this.bs = []
         this.svgSource = svgSource
-        this.borderTransparent = false
+        this.fillColor = "#000000"
+        this.strokeColor = "#000000"
         this.fillTransparent = false
+        this.borderTransparent = false
+        this.numberPoints = numberPoints
         if(!svgSource){
             return
         }
@@ -32,7 +35,8 @@ class Path{
             this.r_strokeColor = colorConverter(svgSource.getAttribute("stroke"))
         }
         else{
-            this.r_strokeColor = "#00000000"
+            this.r_strokeColor = "#000000"
+            this.borderTransparent = true
         }
         if(svgSource.getAttribute("fill") && svgSource.getAttribute("fill")!=="null") {
             this.r_fillColor = colorConverter(svgSource.getAttribute("fill"))
@@ -42,7 +46,7 @@ class Path{
         }
         this.fillColor = this.r_fillColor
         this.strokeColor = this.r_strokeColor
-        this.numberPoints = numberPoints
+
     }
 
     getParamd(){

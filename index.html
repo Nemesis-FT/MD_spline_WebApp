@@ -71,6 +71,9 @@
 <div class="container-fluid">
     <div style="display: flex; flex-direction: row; height: 90%">
         <div style="width: 5%; display: flex; flex-direction: column; border-style: inset;">
+            <button type="button" class="btn btn-success" onclick="zoom_whole(event)">
+                <span class="glyphicon glyphicon-picture" aria-hidden="true"></span>
+            </button>
             <button type="button" class="btn btn-success" onclick="zoom(event)">
                 <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
             </button>
@@ -91,10 +94,12 @@
             </button>
             <form>
                 <div class="form-group">
+                    <input type="checkbox" id="border_transparency" checked onclick="transparency('border', event)">
                     <label for="strokeCol">Border</label>
                     <input type="color" class="form-control mb-2 mr-sm-2 mb-sm-0" id="strokeCol" value="#ff0000"
                            onchange="setStrokeColor(event)">
                     <br>
+                    <input type="checkbox" id="fill_transparency" checked onclick="transparency('fill', event)">
                     <label for="fillCol">Fill</label>
                     <input type="color" class="form-control mb-2 mr-sm-2 mb-sm-0" id="fillCol" value="#ffffff"
                            onchange="setFillColor(event)">

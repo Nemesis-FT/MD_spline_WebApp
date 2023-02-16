@@ -82,7 +82,7 @@ class Project{
         if (this.svg_source === null) {
             let svg = `<svg xmlns=\"http://www.w3.org/2000/svg\" width="${this.viewbox.xmax}" height="${this.viewbox.ymax}" viewBox="${this.viewbox.xmin} ${this.viewbox.ymin} ${this.viewbox.xmax} ${this.viewbox.ymax}">\n`
             for (let i = 0; i < paths_dataset.length; i++) {
-                svg += "<path d=\"" + paths_dataset[i] + "\" stroke='"+this.paths[i].strokeColor+"' fill='"+this.paths[i].fillColor+"' />\n"
+                svg += "<path d=\"" + paths_dataset[i] + "\" stroke='"+((this.paths[i].borderTransparent) ? "transparent" : this.paths[i].strokeColor)+"' fill='"+((this.paths[i].fillTransparent) ? "transparent" : this.paths[i].fillColor)+"' />\n"
             }
             svg += "</svg>\n"
             return svg;
@@ -115,15 +115,15 @@ class Project{
                     }
                     if(p.tagName==="path"){
                         p.setAttribute("d", paths_dataset[i])
-                        p.setAttribute("stroke", this.paths[i].strokeColor)
-                        p.setAttribute("fill", this.paths[i].fillColor)
+                        p.setAttribute("stroke", ((this.paths[i].borderTransparent) ? "transparent" : this.paths[i].strokeColor))
+                        p.setAttribute("fill", ((this.paths[i].fillTransparent) ? "transparent" : this.paths[i].fillColor))
                     }
                     else{
                         let tmp = this.svg_source.createElement("path", "http://www.w3.org/2000/svg")
                         tmp.removeAttribute("xmlns")
                         tmp.setAttribute("d", paths_dataset[i])
-                        tmp.setAttribute("stroke", this.paths[i].strokeColor)
-                        tmp.setAttribute("fill", this.paths[i].fillColor)
+                        tmp.setAttribute("stroke", ((this.paths[i].borderTransparent) ? "transparent" : this.paths[i].strokeColor))
+                        tmp.setAttribute("fill", ((this.paths[i].fillTransparent) ? "transparent" : this.paths[i].fillColor))
                         p.parentElement.appendChild(tmp)
                         p.parentElement.removeChild(p)
                     }
@@ -132,8 +132,8 @@ class Project{
                     let p = this.svg_source.createElement("path")
                     p.id = Math.floor(Date.now() / 1000) + this.paths[i].id
                     p.setAttribute("d", paths_dataset[i])
-                    p.setAttribute("stroke", this.paths[i].strokeColor)
-                    p.setAttribute("fill", this.paths[i].fillColor)
+                    p.setAttribute("stroke", ((this.paths[i].borderTransparent) ? "transparent" : this.paths[i].strokeColor))
+                    p.setAttribute("fill", ((this.paths[i].fillTransparent) ? "transparent" : this.paths[i].fillColor))
                     svg_tag.appendChild(p)
                 }
 
