@@ -240,6 +240,7 @@ function selectPath(id, nosave = false, dontdraw = false) {
             project.paths[project.active_path].IDelement = IDelement
             project.paths[project.active_path].fl = fl
             project.paths[project.active_path].bs = bs
+            project.paths[project.active_path].numberPoints = NUMBER_POINT
         } catch (e) {
         }
     }
@@ -252,6 +253,9 @@ function selectPath(id, nosave = false, dontdraw = false) {
     IDelement = project.paths[project.active_path].IDelement
     fl = project.paths[project.active_path].fl
     bs = project.paths[project.active_path].bs
+    NUMBER_POINT = project.paths[project.active_path].numberPoints
+    npoints = document.getElementById("npoint")
+    npoints.innerText = NUMBER_POINT
     if(!nosave){
         active_path = project.active_path
     }
@@ -347,12 +351,14 @@ function multipleRender(ignore_active=false) {
     let active = project.active_path
     //ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (let i = 0; i < project.paths.length; i++) {
+
         if (active === i && !ignore_active) {
             selectPath(project.paths[i].id, false, true)
             var period = paramd.continuity[paramd.indicePrimoBreakPoint];
-            redraw1(pointShape, controlPoint, period, false, project.paths[project.active_path].strokeColor, project.paths[project.active_path].fillColor);
+            redraw1(pointShape, controlPoint, period, false, "green", "black");
         }
-        else if (renderList.includes(project.paths[i].id)) {
+        else if (renderList.includes(project.paths[i].id) && active != i) {
+            ctx.strokeStyle = "black"
             selectPath(project.paths[i].id, false, true)
             let e = new Event("", undefined);
             drawOnlyCurve(e, false);
@@ -583,6 +589,8 @@ function mouseMoveFunction(e) {
 function setEvalPoints(){
     value = document.getElementById("npoint").innerText
     NUMBER_POINT = Number(value)
+    var period = paramd.continuity[paramd.indicePrimoBreakPoint];
+    pointShape = redraw(bs, fl, controlPoint, pointShape, period, project.paths[project.active_path].strokeColor, project.paths[project.active_path].fillColor);
 }
 
 /**
