@@ -551,8 +551,8 @@ function mouseMoveFunction(e) {
             IDlinePoint = intersect(e, pointShape);
             if (IDlinePoint !== -1 && project.active_path == active_path) {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                //redraw2(pointShape, controlPoint, IDlinePoint, paramd.continuity[paramd.indicePrimoBreakPoint], "green", "black");
-                multipleRender()
+                redraw2(pointShape, controlPoint, IDlinePoint, paramd.continuity[paramd.indicePrimoBreakPoint], "green", "black");
+                multipleRender(true)
             }
 
         }
@@ -598,6 +598,28 @@ function mouseMoveFunction(e) {
 function setEvalPoints(){
     value = document.getElementById("npoint").value
     NUMBER_POINT = Number(value)
+    paramd = _.cloneDeep(project.paths[project.active_path].getParamd());
+    var degree = Number($('#degree').val());
+    var continuity = Number($('#continuity').val());
+
+    paramd.degree.push(degree);
+    var period = $('#continuityValue').val();
+
+    if (grid_flag === 1)
+        create_grid(gridx, gridy);
+
+    NUMBER_POINT = Number($('#npoint').val());
+    let myStruct = mainVD_MDspl_new(paramd, (Number(period) + Number(controlPoint.length) + 1), Number(period), degree, continuity, NUMBER_POINT);
+    paramd = _.cloneDeep(myStruct.param);
+    bs = myStruct.myStruct.bs;
+    fl = myStruct.myStruct.fl;
+
+    createPoint(controlPoint, 'black', Number(period));
+    pointShape = calculateMatrixControl(bs, fl, controlPoint, pointShape, Number(period));
+    createPoint(pointShape, 'green', Number(period));
+    appendInfo(paramd);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    multipleRender()
 }
 
 /**

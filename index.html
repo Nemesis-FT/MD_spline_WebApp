@@ -24,7 +24,7 @@
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
                        aria-expanded="false">File<span class="caret"></span></a>
                     <ul class="dropdown-menu">
-                        <li><a href="#" onclick="location.reload()">New</a></li>
+                        <li><a href="#" onclick="removeAllPaths()">New</a></li>
                         <li role="separator" class="divider"></li>
                         <li><a href="#" onclick="dropdown_load_md()">Load from .md</a></li>
                         <li><a href="#" onclick="dropdown_load_svg()">Load from .svg</a></li>
@@ -121,7 +121,7 @@
                         Delete current path
                     </button>
                     <button type="button" class="btn btn-danger" onclick="removeAllPaths()">
-                        Delete all paths
+                        Clear
                     </button>
 
                 </div>
