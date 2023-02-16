@@ -365,6 +365,8 @@ function multipleRender(ignore_active=false) {
     let active_path = project.paths[project.active_path]
     let active = project.active_path
     //ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if(grid_flag==1)
+        create_grid(gridx, gridy);
     for (let i = 0; i < project.paths.length; i++) {
 
         if (active === i && !ignore_active) {
@@ -381,6 +383,7 @@ function multipleRender(ignore_active=false) {
 
     }
     selectPath(active_path.id, false, true)
+
 }
 
 /**
@@ -558,7 +561,7 @@ function mouseMoveFunction(e) {
             IDlinePoint = intersect(e, pointShape);
             if (IDlinePoint !== -1 && project.active_path == active_path) {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                redraw2(pointShape, controlPoint, IDlinePoint, paramd.continuity[paramd.indicePrimoBreakPoint], "green", "black");
+                redraw2(pointShape, controlPoint, IDlinePoint, paramd.continuity[paramd.indicePrimoBreakPoint], "green", "transparent");
                 multipleRender(true)
             }
 
@@ -1570,7 +1573,7 @@ function gridfun(event, notoggle=false) {
     if(!notoggle){
         grid_flag = 1 - grid_flag;
     }
-
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     gridx = []
     gridy = []
     vxmax = canvas.width - 10;
@@ -1593,10 +1596,9 @@ function gridfun(event, notoggle=false) {
         }
     }
     create_grid(gridx, gridy);
-    if (initButton) {
         //redraw6(pointShape, controlPoint, paramd.continuity[paramd.indicePrimoBreakPoint], "green", "black");
-        multipleRender()
-    }
+    multipleRender()
+
 }
 
 /**

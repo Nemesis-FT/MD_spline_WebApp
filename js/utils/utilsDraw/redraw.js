@@ -5,8 +5,7 @@ function redraw(bs, fl, controlPoint, pointShape, period, strokeColor, fillColor
     if(fill){
         fillPolygon(pointShape, fillColor);
     }
-    if(grid_flag==1)
-      create_grid(gridx, gridy);
+
     var calculatedPoint = calculateMatrixControl(bs, fl, controlPoint, pointShape, period);
     if (si_cps == 1){
       createPoint(controlPoint,'black', period);  //control points
@@ -24,8 +23,7 @@ function redraw1(calculatedPoint, controlPoint, period, clear=true, strokeColor,
     if(fill){
         fillPolygon(pointShape, fillColor);
     }
-    if(grid_flag==1)
-      create_grid(gridx, gridy);
+
     if(controlPoint.length===0){
         return;
     }
@@ -44,8 +42,7 @@ function redraw2(pointShape, controlPoint, idPoint, period, strokeColor, fillCol
     if(fill){
         fillPolygon(pointShape, fillColor);
     }
-    if(grid_flag==1)
-      create_grid(gridx, gridy);
+
     if (si_cps == 1){
        createPoint(controlPoint, 'black', period);  //control points
     }
@@ -76,6 +73,7 @@ function redraw3(calculatedPoint, period, clear=true, strokeColor, fillColor){
     if(fill){
         fillPolygon(pointShape, fillColor);
     }
+
     createPoint2(calculatedPoint,strokeColor,period);  //curve points
 
 }
@@ -88,8 +86,7 @@ function redraw4(bs, controlPoint, pointShape, period, ind, strokeColor, fillCol
     if(fill){
         fillPolygon(pointShape, fillColor);
     }
-    if(grid_flag==1)
-      create_grid(gridx, gridy);
+
     var calculatedPoint = calculateMatrixControl(bs, fl, controlPoint, pointShape, period, ind);
     if (si_cps == 1){
        createPoint(controlPoint,'black', period);  //control points
@@ -116,8 +113,7 @@ function redraw6(pointShape, controlPoint, period, clear=true, strokeColor, fill
         fillPolygon(pointShape, fillColor);
     }
 
-    if(grid_flag==1)
-      create_grid(gridx, gridy);
+
     if (si_cps == 1){
       createPoint(controlPoint, 'black', period);  //control points
     }

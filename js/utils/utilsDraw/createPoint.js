@@ -125,7 +125,6 @@ function fillPolygon(points, color) {
     }
 
 function create_grid(grid, color) {
-       ctx.clearRect(0, 0, canvas.width, canvas.height);
        if (grid_flag == 1) {
             var nx = ngridx-1;
             var ny = ngridy-1;
