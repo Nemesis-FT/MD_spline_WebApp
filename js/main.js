@@ -27,6 +27,9 @@ var paramd;
 var canvas = document.getElementById('canvas');
 let project = new Project()
 
+/**
+ * Resizing handler
+ */
 function resize() {
 
     let parent = canvas.parentNode
@@ -198,6 +201,10 @@ function addPath(svg_data = null) {
     selectPath(project.id - 1)
 }
 
+/**
+ * Given a path id, this function removes that path.
+ * @param id
+ */
 function removePathById(id){
     active = project.paths[project.active_path].id
     selectPath(id, false, true)
@@ -559,7 +566,7 @@ function mouseMoveFunction(e) {
     if (mode === "draw") {
         if (initButton) {
             IDlinePoint = intersect(e, pointShape);
-            if (IDlinePoint !== -1 && project.active_path == active_path) {
+            if (IDlinePoint !== -1 && project.active_path == active_path && !pan) {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 redraw2(pointShape, controlPoint, IDlinePoint, paramd.continuity[paramd.indicePrimoBreakPoint], "green", "transparent");
                 multipleRender(true)
@@ -570,6 +577,7 @@ function mouseMoveFunction(e) {
             var ipoint = getMousePos(e);
             ipoint = gridPoint(ipoint);
             if (pan) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
                 panning(ipoint)
             } else {
                 //aggiorno la posizione dell'elemento in posizione IDelement
@@ -1921,6 +1929,10 @@ function drawOnlyCurve(event, clear = true) {
     }
 }
 
+/**
+ * Old fill function
+ * @param event
+ */
 function drawInside(event) {
     event.preventDefault();
     if (inblock) return;
@@ -2270,6 +2282,11 @@ function CloseCurve(event) {
     }
 }
 
+/**
+ * Used to toggle on or off the transparency of the current spline
+ * @param type (can be either "fill" or "border")
+ * @param event the event
+ */
 function transparency(type, event){
     if(type === "fill"){
         fillTransparency = !event.target.checked
@@ -2279,6 +2296,9 @@ function transparency(type, event){
     }
 }
 
+/**
+ * Old function that was used to toggle the debug infromation screen
+ */
 function showInfoToggle() {
     let panel = document.getElementById("infoShape")
     if (panel.style.display === "none") {

@@ -1,3 +1,6 @@
+/**
+ * The Project class is used as the repository for the paths and as the svg exporter.
+ */
 class Project{
     constructor() {
         this.paths = []
@@ -7,15 +10,29 @@ class Project{
         this.viewbox = {xmax:1, xmin:0, ymax:1, ymin:0}
     }
 
+    /**
+     * Sets the project's svg source
+     * @param source
+     */
     setSvgSource(source){
         this.svg_source=source;
     }
 
+    /**
+     * Adds a path to the project
+     * @param svgSource
+     * @param numPoints
+     */
     addPath(svgSource = null, numPoints){
         this.paths.push(new Path(this.id, svgSource, numPoints))
         this.id++;
     }
 
+    /**
+     * Selects and activates a path
+     * @param id
+     * @returns {null|*}
+     */
     selectPath(id){
         for(let i=0; i<this.paths.length; i++){
             if(this.paths[i].id===id){
@@ -26,6 +43,11 @@ class Project{
         return null
     }
 
+    /**
+     * Checks if a path exists
+     * @param id
+     * @returns {boolean}
+     */
     pathExists(id){
         for(let i=0; i<this.paths.length; i++){
             if(this.paths[i].id===id){
@@ -35,6 +57,10 @@ class Project{
         return false
     }
 
+    /**
+     * Creates the contents of the sidebar menu "pathlist"
+     * @param container_id
+     */
     createPathHtml(container_id){
         let container = document.getElementById(container_id)
         container.innerHTML = "";
@@ -43,10 +69,18 @@ class Project{
         }
     }
 
+    /**
+     * Removes one of the paths
+     */
     popPath(){
         this.paths.splice(this.active_path,1)
     }
 
+    /**
+     * Switches up the order of the paths
+     * @param id
+     * @param up
+     */
     switchPath(id, up){
         let target = null
         let idx=0
@@ -78,6 +112,9 @@ class Project{
         }
     }
 
+    /**
+     * Removes the transform attribute from elements that may have it
+     */
     purge_transforms(){
         let elements = this.svg_source.querySelectorAll("path, ellipse, rect, circle, line, polyline, polygon, g")
         for(let i = 0; i<elements.length; i++){
@@ -85,6 +122,11 @@ class Project{
         }
     }
 
+    /**
+     * Creates the SVG
+     * @param paths_dataset
+     * @returns {Promise<string>}
+     */
     async createSVG(paths_dataset) {
         if (this.svg_source === null) {
             let svg = `<svg xmlns=\"http://www.w3.org/2000/svg\" width="${this.viewbox.xmax}" height="${this.viewbox.ymax}" viewBox="${this.viewbox.xmin} ${this.viewbox.ymin} ${this.viewbox.xmax} ${this.viewbox.ymax}">\n`

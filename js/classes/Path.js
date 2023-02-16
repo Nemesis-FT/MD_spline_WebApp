@@ -1,3 +1,6 @@
+/**
+ * The path class is used to store and generate elements that are related to a single path.
+ */
 class Path{
     constructor(id, svgSource = null, numberPoints) {
         this.paramd = {
@@ -56,6 +59,10 @@ class Path{
         return this.paramd;
     }
 
+    /**
+     * This section is responsable for creating the entry in the pathlist on the right sidebar
+     * @param container
+     */
     createHTML(container){
         let element = document.createElement("li")
         element.className="list-group-item";
