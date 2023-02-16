@@ -78,6 +78,13 @@ class Project{
         }
     }
 
+    purge_transforms(){
+        let elements = this.svg_source.querySelectorAll("path, ellipse, rect, circle, line, polyline, polygon, g")
+        for(let i = 0; i<elements.length; i++){
+            elements[i].removeAttribute("transform")
+        }
+    }
+
     async createSVG(paths_dataset) {
         if (this.svg_source === null) {
             let svg = `<svg xmlns=\"http://www.w3.org/2000/svg\" width="${this.viewbox.xmax}" height="${this.viewbox.ymax}" viewBox="${this.viewbox.xmin} ${this.viewbox.ymin} ${this.viewbox.xmax} ${this.viewbox.ymax}">\n`
@@ -91,6 +98,7 @@ class Project{
             let paths
             let svg_tag
             if(this.svg_source!==null){
+                this.purge_transforms()
                 paths = await this.svg_source.querySelectorAll("path, ellipse, rect, circle, line, polyline, polygon")
                 svg_tag = await this.svg_source.getElementsByTagName("svg")[0]
                 svg_tag.setAttribute("width", this.viewbox.xmax)

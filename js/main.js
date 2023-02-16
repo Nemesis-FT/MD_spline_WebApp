@@ -1264,7 +1264,7 @@ function svg_loadFile(event) {
             toggleFill(event)
         }
         setPathRenderList()
-        zoom(event, false)
+        zoom_whole(event)
     }
     reader.readAsText(event.target.files[0])
 }
@@ -1752,6 +1752,7 @@ function zoom_selection() {
         zoom_view(pointShape, controlPoint, -1, ratio)
     }
     selectPath(project.paths[active].id, false, true)
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
 /**
@@ -2014,6 +2015,7 @@ function rotate(event) {
         }
         selectPath(project.paths[active].id, false, true)
         //redraw1(pointShape, controlPoint, period, true, "green", "black");
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         multipleRender()
     }
 }
@@ -2053,7 +2055,7 @@ function mirrorX(event) {
         }
         selectPath(project.paths[active].id, false, true)
         //redraw1(pointShape, controlPoint, period, true, "green", "black");
-
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         multipleRender()
     }
 }
@@ -2093,6 +2095,7 @@ function mirrorY(event) {
         }
         selectPath(project.paths[active].id, false, true)
         //redraw1(pointShape, controlPoint, period, true, "green", "black");
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         multipleRender()
     }
 }
