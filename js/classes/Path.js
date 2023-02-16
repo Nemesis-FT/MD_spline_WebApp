@@ -80,5 +80,10 @@ class Path{
         button3.setAttribute("onclick", "movePathDown("+(this.id).toString()+")")
         button3.innerText = "Move up";
         element.append(button3)
+        let button4 = document.createElement("button")
+        button4.className="btn btn-danger";
+        button4.setAttribute("onclick", "removePathById("+(this.id).toString()+")")
+        button4.innerText = "X";
+        element.append(button4)
     }
 }

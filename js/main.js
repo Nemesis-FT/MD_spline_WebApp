@@ -198,6 +198,13 @@ function addPath(svg_data = null) {
     selectPath(project.id - 1)
 }
 
+function removePathById(id){
+    active = project.paths[project.active_path].id
+    selectPath(id, false, true)
+    removePath()
+    selectPath(active, false, false)
+}
+
 /**
  * Function that removes the selected path from the project.
  */

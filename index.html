@@ -117,9 +117,9 @@
                     <button type="button" class="btn btn-success" onclick="addPath()">
                         Add Path
                     </button>
-                    <button type="button" class="btn btn-warning" onclick="removePath()">
+                    <!--<button type="button" class="btn btn-warning" onclick="removePath()">
                         Delete current path
-                    </button>
+                    </button>-->
                     <button type="button" class="btn btn-danger" onclick="removeAllPaths()">
                         Clear
                     </button>
@@ -212,7 +212,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title" id="exampleModalLongTitle">How to use C1 MD-Spline Demo</h4>
+                    <h4 class="modal-title" id="exampleModalLongTitle">How to use C1 MD-Spline Demo v3.0</h4>
                 </div>
                 <div class="modal-body">
                     <div class="row">
@@ -223,18 +223,31 @@
                     </div>
                     <div class="row">
                         <div class="col-md-6">
-                            <label>To start from scratch</label>
+                            <label>To start from scratch:</label>
                             <ul>
-                                <li>Left click on the canvas to set the spline curve control points (CPs);</li>
-                                <li>Right click to end</li>
+                                <li>Left click on the canvas to set the spline curve control points (CPs).</li>
+                                <li>Right click to end the spline definition.</li>
                             </ul>
-                            <label>To start from file</label>
+                            <label>To start from file:</label>
                             <ul>
-                                <li>Load md file</li>
-                                <li>Load SVG path file</li>
+                                <li>File > Load from .md or</li>
+                                <li>File > Load from .svg</li>
                             </ul>
-                            <label>Then try to model</label>
+                            <label>To use the multipath capabilities:</label>
+                            <ul>
+                                <li>Click on "Add path" to add a path</li>
+                                <li>Click on "Clear" to start over</li>
+                                <li>Click on "Select" to activate a certain path</li>
+                                <li>Click on "Move up/down" to change the path order</li>
+                                <li>Click on "X" to remove the path</li>
+                                <li>Enter a list of paths (separated by comma) or the wildcard * and click on render to see multiple paths at once</li>
+                            </ul>
                         </div>
+                        <label>To save your project:</label>
+                        <ul>
+                            <li>File > Save to .md or</li>
+                            <li>File > Save to .svg</li>
+                        </ul>
                         <div class="col-md-6">
                             <label>Left button</label>
                             <ul>
@@ -248,10 +261,8 @@
                                 <li> click on white/red circle to select a break-point</li>
                                 <li> click on yellow circle to select a segment</li>
                             </ul>
-                            <label>Move the mouse button on the canvas to redraw</label>
-                            <label>Use the mouse wheel to zoom</label>
                         </div>
-
+                        <a href="Manual.pdf" target="_blank">For further information, read the manual.</a>
                     </div>
                 </div>
                 <div class="modal-footer">
