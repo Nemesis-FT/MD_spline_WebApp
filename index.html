@@ -94,9 +94,11 @@
                     <label for="strokeCol">Border</label>
                     <input type="color" class="form-control mb-2 mr-sm-2 mb-sm-0" id="strokeCol" value="#ff0000"
                            onchange="setStrokeColor(event)">
+                    <br>
                     <label for="fillCol">Fill</label>
                     <input type="color" class="form-control mb-2 mr-sm-2 mb-sm-0" id="fillCol" value="#ffffff"
                            onchange="setFillColor(event)">
+
                 </div>
             </form>
         </div>
@@ -112,6 +114,9 @@
                     </button>
                     <button type="button" class="btn btn-warning" onclick="removePath()">
                         Delete current path
+                    </button>
+                    <button type="button" class="btn btn-danger" onclick="removeAllPaths()">
+                        Delete all paths
                     </button>
 
                 </div>
@@ -129,7 +134,7 @@
                     <label for="continuity">Render following paths:</label>
                     <input type="text" class="form-control" id="paths_render">
                     <button type="button" class="btn btn-success" onclick="setPathRenderList()">
-                        Run
+                        Render
                     </button>
                 </form>
             </div>
@@ -173,7 +178,14 @@
                         <input type="text" class="form-control" id="continuityValue" value=-1 disabled/>
                         </span>
                         <label for="npoint">Eval.Points for Span</label>
-                        <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="npoint" value=21>
+                        <div>
+                            <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="npoint" value=21>
+                            <button type="button" class="btn btn-success" onclick="setEvalPoints()">
+                                Apply
+                            </button>
+                        </div>
+
+
                         <label for="gridR">Grid-Res.</label>
                         <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="gridR" value=20>
 

@@ -1,5 +1,5 @@
 class Path{
-    constructor(id, svgSource = null) {
+    constructor(id, svgSource = null, numberPoints) {
         this.paramd = {
             degree: [],
             continuity: [],
@@ -23,22 +23,26 @@ class Path{
         this.fl = []
         this.bs = []
         this.svgSource = svgSource
+        this.borderTransparent = false
+        this.fillTransparent = false
         if(!svgSource){
             return
         }
         if(svgSource.getAttribute("stroke") && svgSource.getAttribute("stroke")!=="null"){
-            this.strokeColor = colorConverter(svgSource.getAttribute("stroke"))
+            this.r_strokeColor = colorConverter(svgSource.getAttribute("stroke"))
         }
         else{
-            this.strokeColor = "#00000000"
+            this.r_strokeColor = "#00000000"
         }
         if(svgSource.getAttribute("fill") && svgSource.getAttribute("fill")!=="null") {
-            this.fillColor = colorConverter(svgSource.getAttribute("fill"))
+            this.r_fillColor = colorConverter(svgSource.getAttribute("fill"))
         }
         else{
-            this.fillColor = "#000000"
+            this.r_fillColor = "#000000"
         }
-
+        this.fillColor = this.r_fillColor
+        this.strokeColor = this.r_strokeColor
+        this.numberPoints = numberPoints
     }
 
     getParamd(){

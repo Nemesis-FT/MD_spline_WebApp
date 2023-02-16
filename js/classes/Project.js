@@ -11,8 +11,8 @@ class Project{
         this.svg_source=source;
     }
 
-    addPath(svgSource = null){
-        this.paths.push(new Path(this.id, svgSource))
+    addPath(svgSource = null, numPoints){
+        this.paths.push(new Path(this.id, svgSource, numPoints))
         this.id++;
     }
 

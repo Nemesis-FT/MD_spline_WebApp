@@ -37,13 +37,11 @@ function resize() {
     }
     else{
         try{
-            redraw6(pointShape, controlPoint, paramd.continuity[paramd.indicePrimoBreakPoint], project.paths[project.active_path].strokeColor, project.paths[project.active_path].fillColor);
+            redraw1(pointShape, controlPoint, period, false, "green", "black");
+            multipleRender(true)
         }
         catch (e) {
             
-        }
-        if (renderList.length !== 0) {
-            multipleRender()
         }
         if(grid_flag){
             gridfun(new Event("test"), true)
@@ -153,13 +151,16 @@ canvas.oncontextmenu = function (e) {
 
         if (period > -1) {
             if (controlPoint.length < 3) {
+                controlPoint = []
+                initButton = false;
                 alert('You must insert at least 3');
                 return;
             }
 
         } else {
-
             if (controlPoint.length < degree + 1) {
+                controlPoint = []
+                initButton = false;
                 alert('You must insert at least ' + (degree + 1) + ' points');
                 return;
             }
@@ -189,7 +190,7 @@ canvas.oncontextmenu = function (e) {
  * @param svg_data the original svg representation - if present.
  */
 function addPath(svg_data = null) {
-    project.addPath(svg_data)
+    project.addPath(svg_data, NUMBER_POINT)
     initButton = false;
     project.createPathHtml("pathList")
     selectPath(project.id - 1)
@@ -225,7 +226,6 @@ function removePath() {
  * @param dontdraw boolean that enables (or disables) curve redrawing.
  */
 function selectPath(id, nosave = false, dontdraw = false) {
-
     if (id === null || id === undefined) {
         return
     }
@@ -347,7 +347,6 @@ function multipleRender(ignore_active=false) {
     let active = project.active_path
     //ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (let i = 0; i < project.paths.length; i++) {
-        ctx.strokeStyle = "black"
         if (active === i && !ignore_active) {
             selectPath(project.paths[i].id, false, true)
             var period = paramd.continuity[paramd.indicePrimoBreakPoint];
@@ -424,12 +423,8 @@ function mouseUpFunction(e) {
 
         var period = paramd.continuity[paramd.indicePrimoBreakPoint];
 
-        if (renderList.length !== 0) {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            multipleRender()
-        } else {
-            redraw1(pointShape, controlPoint, period, project.paths[project.active_path].strokeColor, project.paths[project.active_path].fillColor);
-        }
+        redraw1(pointShape, controlPoint, period, true, "green", "black");
+        multipleRender(true)
     }
 }
 
@@ -515,10 +510,8 @@ function panning(ipoint, isPoint = true, useOffsets = false) {
     selectPath(project.paths[active].id, false, true)
     //Ridisegno tutto
     var period = paramd.continuity[paramd.indicePrimoBreakPoint];
-    redraw1(pointShape, controlPoint, period, true, project.paths[project.active_path].strokeColor, project.paths[project.active_path].fillColor);
-    if (renderList.length !== 0) {
-        multipleRender()
-    }
+    redraw1(pointShape, controlPoint, period, true, "green", "black");
+    multipleRender(true)
 }
 
 /**
@@ -528,7 +521,8 @@ function panning(ipoint, isPoint = true, useOffsets = false) {
 function toggleFill(e) {
     fill = !fill
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    multipleRender();
+    redraw1(pointShape, controlPoint, paramd.continuity[paramd.indicePrimoBreakPoint], true, "green", "black");
+    multipleRender(true);
 }
 
 /**
@@ -542,10 +536,8 @@ function mouseMoveFunction(e) {
         if (initButton) {
             IDlinePoint = intersect(e, pointShape);
             if (IDlinePoint !== -1 && project.active_path == active_path) {
-                redraw2(pointShape, controlPoint, IDlinePoint, paramd.continuity[paramd.indicePrimoBreakPoint], project.paths[project.active_path].strokeColor, project.paths[project.active_path].fillColor);
-                if(renderList.length>0){
-                    multipleRender(true)
-                }
+                redraw2(pointShape, controlPoint, IDlinePoint, paramd.continuity[paramd.indicePrimoBreakPoint], "green", "black");
+                multipleRender(true)
             }
 
         }
@@ -564,10 +556,8 @@ function mouseMoveFunction(e) {
                     gcind[i] = gcind[i] * NUMBER_POINT;
 
                 //pointShape = redraw(bs, fl, controlPoint, period);
-                pointShape = redraw4(bs, controlPoint, pointShape, period, gcind, project.paths[project.active_path].strokeColor, project.paths[project.active_path].fillColor);
-                if (renderList.length !== 0) {
-                    multipleRender()
-                }
+                pointShape = redraw4(bs, controlPoint, pointShape, period, gcind, "green", "black");
+                multipleRender(true)
             }
         }
     }
@@ -578,11 +568,8 @@ function mouseMoveFunction(e) {
             zoomBox.x.end = coords.x
             zoomBox.y.end = coords.y
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            if (renderList.length !== 0) {
-                multipleRender()
-            } else {
-                redraw1(pointShape, controlPoint, period, project.paths[project.active_path].strokeColor, project.paths[project.active_path].fillColor);
-            }
+            redraw1(pointShape, controlPoint, period, true, "green", "black");
+            multipleRender(true)
             ctx.fillStyle = "#000000"
             ctx.strokeStyle = "#000000"
             ctx.rect(zoomBox.x.start, zoomBox.y.start, zoomBox.x.end - zoomBox.x.start, zoomBox.y.end - zoomBox.y.start)
@@ -591,6 +578,11 @@ function mouseMoveFunction(e) {
             zoombutton.className = "btn btn-success"
         }
     }
+}
+
+function setEvalPoints(){
+    value = document.getElementById("npoint").innerText
+    NUMBER_POINT = Number(value)
 }
 
 /**
@@ -1219,6 +1211,12 @@ $('#cpModal').on('hidden.bs.modal', function () {
     $('#modalBody').empty();
 });
 
+function removeAllPaths(){
+    project = new Project()
+    addPath()
+    selectPath(0)
+}
+
 /**
  * Load a whole SVG file
  * @param event
@@ -1503,11 +1501,8 @@ $("canvas").mousewheel(function (ev, val) {
         }
         var period = paramd.continuity[paramd.indicePrimoBreakPoint];
         selectPath(project.paths[active].id, false, true)
-        if (renderList.length !== 0) {
-            multipleRender()
-        } else {
-            redraw1(pointShape, controlPoint, period, false, project.paths[project.active_path].strokeColor, project.paths[project.active_path].fillColor);
-        }
+        redraw1(pointShape, controlPoint, period, false, "green", "black");
+        multipleRender(true)
     }
     return;
 });
@@ -1554,10 +1549,8 @@ function gridfun(event, notoggle=false) {
     }
     create_grid(gridx, gridy);
     if (initButton) {
-        redraw6(pointShape, controlPoint, paramd.continuity[paramd.indicePrimoBreakPoint], project.paths[project.active_path].strokeColor, project.paths[project.active_path].fillColor);
-        if (renderList.length !== 0) {
-            multipleRender()
-        }
+        redraw6(pointShape, controlPoint, paramd.continuity[paramd.indicePrimoBreakPoint], "green", "black");
+        multipleRender(true)
     }
 }
 
@@ -1648,12 +1641,8 @@ function zoom(event, dontclear = false) {
 
         var period = paramd.continuity[paramd.indicePrimoBreakPoint];
 
-        if (renderList.length !== 0) {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            multipleRender()
-        } else {
-            redraw1(pointShape, controlPoint, period, project.paths[project.active_path].strokeColor, project.paths[project.active_path].fillColor);
-        }
+        redraw1(pointShape, controlPoint, period, true, "green", "black");
+        multipleRender(true)
 
     }
 }
@@ -1789,10 +1778,8 @@ function drawMDBS(event) {
  */
 function setStrokeColor(event) {
     project.paths[project.active_path].strokeColor = event.target.value
-    redraw6(pointShape, controlPoint, paramd.continuity[paramd.indicePrimoBreakPoint], project.paths[project.active_path].strokeColor, project.paths[project.active_path].fillColor);
-    if (renderList.length !== 0) {
-        multipleRender()
-    }
+    //redraw6(pointShape, controlPoint, paramd.continuity[paramd.indicePrimoBreakPoint], "green", "black");
+    multipleRender(true)
 }
 /**
  * Sets filling color.
@@ -1800,10 +1787,8 @@ function setStrokeColor(event) {
  */
 function setFillColor(event) {
     project.paths[project.active_path].fillColor = event.target.value
-    redraw6(pointShape, controlPoint, paramd.continuity[paramd.indicePrimoBreakPoint], project.paths[project.active_path].strokeColor, project.paths[project.active_path].fillColor);
-    if (renderList.length !== 0) {
-        multipleRender()
-    }
+    //redraw6(pointShape, controlPoint, paramd.continuity[paramd.indicePrimoBreakPoint], "green", "true");
+    multipleRender(true)
 }
 
 /**
@@ -1889,7 +1874,7 @@ function upapprox(event) {
         fl = myStruct.fl;
 
         var period = paramd.continuity[paramd.indicePrimoBreakPoint];
-        pointShape = redraw(bs, fl, controlPoint, pointShape, period, project.paths[project.active_path].strokeColor, project.paths[project.active_path].fillColor);
+        pointShape = redraw(bs, fl, controlPoint, pointShape, period, "green", "black");
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         multipleRender()
         appendInfo(paramd);
@@ -1948,14 +1933,11 @@ function rotate(event) {
             fl = myStruct.fl;
 
             var period = paramd.continuity[paramd.indicePrimoBreakPoint];
-            pointShape = redraw(bs, fl, controlPoint, pointShape, period, project.paths[project.active_path].strokeColor, project.paths[project.active_path].fillColor);
+            pointShape = redraw(bs, fl, controlPoint, pointShape, period, "green", "black");
         }
         selectPath(project.paths[active].id, false, true)
-        if (renderList.length !== 0) {
-            multipleRender()
-        } else {
-            redraw1(pointShape, controlPoint, period, true, project.paths[project.active_path].strokeColor, project.paths[project.active_path].fillColor);
-        }
+        redraw1(pointShape, controlPoint, period, true, "green", "black");
+        multipleRender(true)
     }
 }
 
@@ -1990,14 +1972,12 @@ function mirrorX(event) {
             fl = myStruct.fl;
 
             var period = paramd.continuity[paramd.indicePrimoBreakPoint];
-            pointShape = redraw(bs, fl, controlPoint, pointShape, period, project.paths[project.active_path].strokeColor, project.paths[project.active_path].fillColor);
+            pointShape = redraw(bs, fl, controlPoint, pointShape, period, "green", "black");
         }
         selectPath(project.paths[active].id, false, true)
-        if (renderList.length !== 0) {
-            multipleRender()
-        } else {
-            redraw1(pointShape, controlPoint, period, true, project.paths[project.active_path].strokeColor, project.paths[project.active_path].fillColor);
-        }
+        redraw1(pointShape, controlPoint, period, true, "green", "black");
+
+        multipleRender(true)
     }
 }
 
@@ -2032,14 +2012,11 @@ function mirrorY(event) {
             fl = myStruct.fl;
 
             var period = paramd.continuity[paramd.indicePrimoBreakPoint];
-            pointShape = redraw(bs, fl, controlPoint, pointShape, period, project.paths[project.active_path].strokeColor, project.paths[project.active_path].fillColor);
+            pointShape = redraw(bs, fl, controlPoint, pointShape, period, "green", "black");
         }
         selectPath(project.paths[active].id, false, true)
-        if (renderList.length !== 0) {
-            multipleRender()
-        } else {
-            redraw1(pointShape, controlPoint, period, true, project.paths[project.active_path].strokeColor, project.paths[project.active_path].fillColor);
-        }
+        redraw1(pointShape, controlPoint, period, true, "green", "black");
+        multipleRender(true)
     }
 }
 
@@ -2082,7 +2059,7 @@ function periodToNoperiod(event) {
         pointShape = _.clone(DrStruct.pointShape);
         period = paramd.continuity[paramd.indicePrimoBreakPoint];
 //          redraw1(pointShape, controlPoint, period);
-        redraw3(pointShape, period, project.paths[project.active_path].strokeColor);
+        redraw3(pointShape, period, "green", "black");
         appendInfo(paramd);
     }
 }
@@ -2124,7 +2101,7 @@ function OpenCurve(event) {
             bs = myStruct.bs;
             fl = myStruct.fl;
 
-            pointShape = redraw(bs, fl, controlPoint, pointShape, period, project.paths[project.active_path].strokeColor, project.paths[project.active_path].fillColor);
+            pointShape = redraw(bs, fl, controlPoint, pointShape, period, "green", "black");
             appendInfo(paramd);
         }
     }
@@ -2174,7 +2151,7 @@ function CloseCurve(event) {
             fl = myStruct.fl;
 
             period = paramd.continuity[paramd.indicePrimoBreakPoint];
-            pointShape = redraw(bs, fl, controlPoint, pointShape, period, project.paths[project.active_path].strokeColor, project.paths[project.active_path].fillColor);
+            pointShape = redraw(bs, fl, controlPoint, pointShape, period, "green", "black");
             appendInfo(paramd);
         }
     }
