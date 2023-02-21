@@ -864,10 +864,9 @@ function path_openFile(data, offsets = null) {
                     // If a moveto command is found, the path parsing is interrupted. A new path gets created, and recursively parsed.
                     let svg = project.paths[project.active_path].svgSource
                     let tmp = document.createElement("path")
+                    tmp = svg;
                     tmp.setAttribute("d", data.slice(gcnum[i], data.length))
                     tmp.setAttribute("id", svg.getAttribute("id") + project.id)
-                    tmp.setAttribute("fill", svg.getAttribute("fill"))
-                    tmp.setAttribute("stroke", svg.getAttribute("stroke"))
                     addPath(tmp)
                     path_openFile(data.slice(gcnum[i], data.length))
                     early_exit = true
