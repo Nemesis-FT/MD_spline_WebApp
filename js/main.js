@@ -40,15 +40,13 @@ function resize() {
     canvas.height = h
     if (project.paths.length === 0) {
 
-    }
-    else{
-        try{
+    } else {
+        try {
             multipleRender()
+        } catch (e) {
+
         }
-        catch (e) {
-            
-        }
-        if(grid_flag){
+        if (grid_flag) {
             gridfun(new Event("test"), true)
         }
     }
@@ -205,7 +203,7 @@ function addPath(svg_data = null) {
  * Given a path id, this function removes that path.
  * @param id
  */
-function removePathById(id){
+function removePathById(id) {
     active = project.paths[project.active_path].id
     selectPath(id, false, true)
     removePath()
@@ -278,7 +276,7 @@ function selectPath(id, nosave = false, dontdraw = false) {
     npoints.value = NUMBER_POINT
     document.getElementById("fill_transparency").checked = !fillTransparency
     document.getElementById("border_transparency").checked = !borderTransparency
-    if(!nosave){
+    if (!nosave) {
         active_path = project.active_path
     }
     if (project.paths[project.active_path].strokeColor) {
@@ -343,8 +341,7 @@ function setPathRenderList() {
         for (let i = 0; i < project.paths.length; i++) {
             ids.push(project.paths[i].id)
         }
-    }
-    else{
+    } else {
         let ids_str = input.value.split(",")
         for (let i = 0; i < ids_str.length; i++) {
             try {
@@ -368,26 +365,43 @@ function setPathRenderList() {
 /**
  * Render multiple paths in a single go
  */
-function multipleRender(ignore_active=false) {
+function multipleRender(ignore_active = false, active_first = true, enforce_style = true, draw_only_cps = false) {
     let active_path = project.paths[project.active_path]
     let active = project.active_path
     //ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if(grid_flag==1)
+    if (grid_flag == 1)
         create_grid(gridx, gridy);
     for (let i = 0; i < project.paths.length; i++) {
 
-        if (active === i && !ignore_active) {
+        if (active === i && !ignore_active && !active_first) {
             selectPath(project.paths[i].id, false, true)
             var period = paramd.continuity[paramd.indicePrimoBreakPoint];
-            redraw1(pointShape, controlPoint, period, false, "green", "transparent");
-        }
-        else if (renderList.includes(project.paths[i].id) && active != i) {
+            if (draw_only_cps) {
+                let e = new Event("", undefined);
+                drawOnlyCurve(e, false)
+            } else {
+                if (enforce_style) {
+                    redraw1(pointShape, controlPoint, period, false, "green", "transparent");
+                } else {
+                    redraw1(pointShape, controlPoint, period, false, ((borderTransparency) ? "transparent" : project.paths[project.active_path].strokeColor), ((fillTransparency) ? "transparent" : project.paths[project.active_path].fillColor));
+                }
+            }
+        } else if (renderList.includes(project.paths[i].id) && active != i) {
             ctx.strokeStyle = "black"
             selectPath(project.paths[i].id, false, true)
             let e = new Event("", undefined);
             drawOnlyCurve(e, false);
         }
 
+    }
+    if (!ignore_active && active_first) {
+        selectPath(project.paths[active].id, false, true)
+        var period = paramd.continuity[paramd.indicePrimoBreakPoint];
+        if (enforce_style) {
+            redraw1(pointShape, controlPoint, period, false, "green", "transparent");
+        } else {
+            redraw1(pointShape, controlPoint, period, false, ((borderTransparency) ? "transparent" : project.paths[project.active_path].strokeColor), ((fillTransparency) ? "transparent" : project.paths[project.active_path].fillColor));
+        }
     }
     selectPath(active_path.id, false, true)
 
@@ -568,8 +582,8 @@ function mouseMoveFunction(e) {
             IDlinePoint = intersect(e, pointShape);
             if (IDlinePoint !== -1 && project.active_path == active_path && !pan) {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                redraw2(pointShape, controlPoint, IDlinePoint, paramd.continuity[paramd.indicePrimoBreakPoint], "green", "transparent");
                 multipleRender(true)
+                redraw2(pointShape, controlPoint, IDlinePoint, paramd.continuity[paramd.indicePrimoBreakPoint], "green", "transparent", false);
             }
 
         }
@@ -613,7 +627,7 @@ function mouseMoveFunction(e) {
     }
 }
 
-function setEvalPoints(){
+function setEvalPoints() {
     value = document.getElementById("npoint").value
     NUMBER_POINT = Number(value)
     paramd = _.cloneDeep(project.paths[project.active_path].getParamd());
@@ -1267,7 +1281,7 @@ $('#cpModal').on('hidden.bs.modal', function () {
     $('#modalBody').empty();
 });
 
-function removeAllPaths(){
+function removeAllPaths() {
     project = new Project()
     addPath()
     selectPath(0)
@@ -1501,6 +1515,7 @@ function wind_view(controlPoint) {
     return {controlPoint: controlPoint};
     */
 }
+
 /**
  * This function is responsable for a major headache. It caused major issues, but now its inoffensive.
  * @param myControlPointToSend
@@ -1575,10 +1590,10 @@ document.getElementById("canvas").onmousewheel = function (event) {
  * Draws a grid.
  * @param event
  */
-function gridfun(event, notoggle=false) {
+function gridfun(event, notoggle = false) {
 
     event.preventDefault();
-    if(!notoggle){
+    if (!notoggle) {
         grid_flag = 1 - grid_flag;
     }
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -1590,12 +1605,12 @@ function gridfun(event, notoggle=false) {
     vymin = 10;
     if (grid_flag == 1) {
         ngridy = Number($('#gridR').val());
-        ratio = Math.abs(canvas.width/canvas.height)
+        ratio = Math.abs(canvas.width / canvas.height)
         console.debug(ratio)
-        ngridx = ngridy*1.5;
+        ngridx = ngridy * 1.5;
         console.debug(Math.floor(ngridx), ngridy)
-        hx = (vxmax - vxmin + 20) / (ngridx-1);
-        hy = (vymax - vymin + 20) / (ngridy-1);
+        hx = (vxmax - vxmin + 20) / (ngridx - 1);
+        hy = (vymax - vymin + 20) / (ngridy - 1);
         for (var i = 0; i < ngridx; i++) {
             gridx[i] = vxmin - 10 + i * hx;
         }
@@ -1604,7 +1619,7 @@ function gridfun(event, notoggle=false) {
         }
     }
     create_grid(gridx, gridy);
-        //redraw6(pointShape, controlPoint, paramd.continuity[paramd.indicePrimoBreakPoint], "green", "black");
+    //redraw6(pointShape, controlPoint, paramd.continuity[paramd.indicePrimoBreakPoint], "green", "black");
     multipleRender()
 
 }
@@ -1636,15 +1651,15 @@ function calc_wminmax() {
 
 function findBounds(points) {
     var n = points.length
-    if(n === 0) {
+    if (n === 0) {
         return []
     }
     var d = points[0].length
     var lo = points[0].slice()
     var hi = points[0].slice()
-    for(var i=1; i<n; ++i) {
+    for (var i = 1; i < n; ++i) {
         var p = points[i]
-        for(var j=0; j<d; ++j) {
+        for (var j = 0; j < d; ++j) {
             var x = p[j]
             lo[j] = Math.min(lo[j], x)
             hi[j] = Math.max(hi[j], x)
@@ -1653,15 +1668,15 @@ function findBounds(points) {
     return [lo, hi]
 }
 
-function zoom_whole(event){
+function zoom_whole(event) {
     if (inblock) return;
 
     if (initButton) {
         let active = project.active_path
         let pts = []
-        for(let k=0; k<project.paths.length; k++){
+        for (let k = 0; k < project.paths.length; k++) {
             selectPath(project.paths[k].id, false, true)
-            for(let i=0; i<controlPoint.length; i++){
+            for (let i = 0; i < controlPoint.length; i++) {
                 pts.push([controlPoint[i].x, controlPoint[i].y])
             }
         }
@@ -1672,7 +1687,7 @@ function zoom_whole(event){
 
         console.debug(result)
 
-        ctx.rect(result[0][0], result[0][1], result[1][0]-result[0][0], result[1][1]-result[0][1])
+        ctx.rect(result[0][0], result[0][1], result[1][0] - result[0][0], result[1][1] - result[0][1])
         ctx.stroke()
         zoomBox.x.start = result[0][0]
         zoomBox.y.start = result[0][1]
@@ -1715,7 +1730,7 @@ function zoom(event, dontclear = false) {
     if (initButton) {
         let active = project.active_path
         let pts = []
-        for(let i=0; i<controlPoint.length; i++){
+        for (let i = 0; i < controlPoint.length; i++) {
             pts.push([controlPoint[i].x, controlPoint[i].y])
         }
         // Bounding box calculation
@@ -1723,7 +1738,7 @@ function zoom(event, dontclear = false) {
 
         console.debug(result)
 
-        ctx.rect(result[0][0], result[0][1], result[1][0]-result[0][0], result[1][1]-result[0][1])
+        ctx.rect(result[0][0], result[0][1], result[1][0] - result[0][0], result[1][1] - result[0][1])
         ctx.stroke()
         zoomBox.x.start = result[0][0]
         zoomBox.y.start = result[0][1]
@@ -1776,10 +1791,9 @@ function zoom_selection() {
     let hratio = (zoomBox.x.end - zoomBox.x.start) / canvas.width
     console.debug(vratio, hratio)
     let ratio;
-    if (vratio<hratio){
+    if (vratio < hratio) {
         ratio = hratio;
-    }
-    else{
+    } else {
         ratio = vratio;
     }
     let active = project.active_path
@@ -1898,6 +1912,7 @@ function setStrokeColor(event) {
     //redraw6(pointShape, controlPoint, paramd.continuity[paramd.indicePrimoBreakPoint], "green", "black");
     multipleRender()
 }
+
 /**
  * Sets filling color.
  * @param event
@@ -2287,11 +2302,10 @@ function CloseCurve(event) {
  * @param type (can be either "fill" or "border")
  * @param event the event
  */
-function transparency(type, event){
-    if(type === "fill"){
+function transparency(type, event) {
+    if (type === "fill") {
         fillTransparency = !event.target.checked
-    }
-    else{
+    } else {
         borderTransparency = !event.target.checked
     }
 }
