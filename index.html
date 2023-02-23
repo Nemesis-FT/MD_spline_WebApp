@@ -51,7 +51,7 @@
                         <li><a href="#" onclick="upapprox(event)">UPApprox</a></li>
                         <li role="separator" class="divider"></li>
                         <li><a href="#" onclick="periodToNoperiod(event)">Convert to non-periodic</a></li>
-                        <li><a href="#" onclick="OpenCurve(event)">Open curve CP0</a></li>
+                        <li><a href="#" onclick="OpenCurve(event)">Open C0 curve</a></li>
                         <li><a href="#" onclick="CloseCurve(event)">Close curve</a></li>
                     </ul>
                 </li>
@@ -121,7 +121,7 @@
                         Delete current path
                     </button>-->
                     <button type="button" class="btn btn-danger" onclick="removeAllPaths()">
-                        Clear
+                        Delete All
                     </button>
 
                 </div>
@@ -137,18 +137,24 @@
 
                 <form class="form-inline">
                     <label for="continuity">Render following paths:</label>
+                    <div>
                     <input type="text" class="form-control" id="paths_render">
                     <button type="button" class="btn btn-success" onclick="setPathRenderList()">
                         Render
                     </button>
+                    </div>
                 </form>
+                <label for="multipath_transforms">Operations on all paths</label>
+                <input type="checkbox" class="form-check-input" name="multipath_transforms_switch"
+                       id="multipath_transforms" checked onchange="transform_switch()">
+                <br>
             </div>
             <!-- QUI -->
             <div class="modal fade" id="cpModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h4 class="modal-title" id="cpmodalTitle">Spline Continuity Editor</h4>
+                            <h4 class="modal-title" id="cpmodalTitle">C1 MD-spline Editor</h4>
                         </div>
                         <div class="modal-body">
                             <div id="modalBody"></div>
@@ -174,10 +180,7 @@
                             <input class="form-check-input" type="radio" name="isClosed" value="false" checked> false
                             <input class="form-check-input" type="radio" name="isClosed" value="true"> true
                         </div>
-                        <label for="multipath_transforms">Transform on all layers</label>
-                        <input type="checkbox" class="form-check-input" name="multipath_transforms_switch"
-                               id="multipath_transforms" checked onchange="transform_switch()">
-                        <br>
+
                         <span id="periodicContinuity">
                         <label for="continuityValue">Periodic continuity</label>
                         <input type="text" class="form-control" id="continuityValue" value=-1 disabled/>
@@ -299,13 +302,13 @@
     <div hidden>
         <form class="form-inline">
             <div class="form-group">
-                <input id='input1' type='file' onchange="md_openFile(event)"/>
+                <input id='input1' type='file' onchange="md_openFile(event)" onclick="resetFileInput('input1')"/>
             </div>
         </form>
 
         <form class="form-inline">
             <div class="form-group">
-                <input id='input2' type='file' onchange="svg_loadFile(event)"/>
+                <input id='input2' type='file' onchange="svg_loadFile(event)" onclick="resetFileInput('input2')"/>
             </div>
         </form>
     </div>

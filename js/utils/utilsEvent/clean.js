@@ -46,6 +46,5 @@ function MyClean(){
 function resetFileInput(id)
 {
 var fld = document.getElementById(id);
-fld.form.reset();
-fld.focus();
+fld.value=null
 }

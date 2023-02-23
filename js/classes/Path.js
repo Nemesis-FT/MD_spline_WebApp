@@ -107,7 +107,7 @@ class Path{
         let button4 = document.createElement("button")
         button4.className="btn btn-danger";
         button4.setAttribute("onclick", "removePathById("+(this.id).toString()+")")
-        button4.innerText = "X";
+        button4.innerText = "Delete";
         element.append(button4)
     }
 }

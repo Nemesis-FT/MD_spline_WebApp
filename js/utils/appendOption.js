@@ -22,18 +22,9 @@ function appendOption(idPoint, param) {
             + '<button id="insertBreakPoint" class="btn btn-primary">Insert breakPoint</button>'
             + '<button id="increaseDegree" class="btn btn-success">Increase degree</button>'
             + '<button id="decreaseDegree" class="btn btn-danger">Decrease degree</button>'
-            + '<button id="cancel" class="btn">Cancel</button>'
             + '</div>'
             + '</div>');
     }
-
-    $('#cancel').click(function (e) {
-        e.preventDefault();
-        inblock = false;
-        $('#modalBody').empty();
-        $('#cpModal').modal('hide')
-    })
-
 
     $('#increaseContinuity').click(function (e) {
         e.preventDefault();

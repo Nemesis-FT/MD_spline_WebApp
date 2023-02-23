@@ -199,6 +199,7 @@ function addPath(svg_data = null) {
     initButton = false;
     project.createPathHtml("pathList")
     selectPath(project.id - 1)
+    setPathRenderList()
 }
 
 /**
@@ -208,24 +209,47 @@ function addPath(svg_data = null) {
 function removePathById(id) {
     active = project.paths[project.active_path].id
     selectPath(id, false, true)
-    removePath()
+    removePath(active)
     selectPath(active, false, false)
 }
 
 /**
  * Function that removes the selected path from the project.
  */
-function removePath() {
+function removePath(active_path_id) {
     if (project.paths.length < 2) {
         alert("One path must remain.")
         return;
     }
-
+    console.debug(renderList)
     let id
     try {
-        id = project.paths[project.active_path - 1].id;
+        if (renderList.length <= 1) {
+            id = project.paths[project.active_path - 1].id;
+        } else {
+            for (let i = 0; i < renderList.length; i++) {
+                if (renderList[i] != active_path_id) {
+                    id = renderList[i]
+                }
+                if (renderList[i] == active_path_id) {
+                    break;
+                }
+            }
+        }
+
     } catch (e) {
-        id = project.paths[project.active_path + 1].id;
+        if (renderList.length <= 1) {
+            id = project.paths[project.active_path + 1].id;
+        } else {
+            for (let i = renderList.length; i > 0; i--) {
+                if (renderList[i - 1] != active_path_id) {
+                    id = renderList[i - 1]
+                }
+                if (renderList[i - 1] == active_path_id) {
+                    break;
+                }
+            }
+        }
     }
     project.popPath()
     project.createPathHtml("pathList")
@@ -263,7 +287,11 @@ function selectPath(id, nosave = false, dontdraw = false) {
         }
     }
     // Selected curve data loading
-    paramd = project.selectPath(id).paramd
+    a = project.selectPath(id)
+    if (a === null) {
+        return
+    }
+    paramd = project.paths[project.active_path].paramd
     controlPoint = project.paths[project.active_path].controlPoint
     pointShape = project.paths[project.active_path].pointShape
     IDlinePoint = project.paths[project.active_path].IDlinePoint
@@ -310,11 +338,16 @@ function selectPath(id, nosave = false, dontdraw = false) {
  * @param id the id of the path that needs to be swapped.
  */
 function movePathUp(id) {
+    let current_id = project.paths[project.active_path].id
+    selectPath(current_id, false, true)
+    console.debug(current_id, id)
     project.switchPath(id, true)
     project.createPathHtml("pathList")
     selectPath(id, true, false)
     let current = document.getElementById("current_path")
     current.innerText = "Current path is #" + (id).toString();
+    selectPath(current_id, true, false)
+    setPathRenderList()
 }
 
 /**
@@ -322,11 +355,16 @@ function movePathUp(id) {
  * @param id the id of the path that needs to be swapped.
  */
 function movePathDown(id) {
+    let current_id = project.paths[project.active_path].id
+    selectPath(current_id, false, true)
+    console.debug(current_id, id)
     project.switchPath(id, false)
     project.createPathHtml("pathList")
     selectPath(id, true, false)
     let current = document.getElementById("current_path")
     current.innerText = "Current path is #" + (id).toString();
+    selectPath(current_id, true, false)
+    setPathRenderList()
 }
 
 /**
@@ -348,10 +386,11 @@ function setPathRenderList() {
         for (let i = 0; i < ids_str.length; i++) {
             try {
                 let id = parseInt(ids_str[i])
-                ids.push(id)
                 if (!project.pathExists(id)) {
-                    alert("Path id " + id + " does not exist.")
-                    return;
+
+                    continue;
+                } else {
+                    ids.push(id)
                 }
             } catch (e) {
                 alert("Input is not valid.")
@@ -449,9 +488,14 @@ function mouseUpFunction(e) {
     if (mode === "zoom") {
         dragging = false
         mode = "draw"
+        let zoombutton = document.getElementById("areaZoomButton")
+        zoombutton.className = "btn btn-success"
         var coords = normalize_coords(e)
         zoomBox.x.end = coords.x
         zoomBox.y.end = coords.y
+        if(zoomBox.x.end===zoomBox.x.start && zoomBox.y.end===zoomBox.y.start){
+            return;
+        }
         if (zoomBox.x.end < zoomBox.x.start) {
             var tmp = zoomBox.x.end
             zoomBox.x.end = zoomBox.x.start
