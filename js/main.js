@@ -406,7 +406,10 @@ function setPathRenderList() {
 /**
  * Render multiple paths in a single go
  */
-function multipleRender(ignore_active = false, active_first = true, enforce_style = true, draw_only_cps = false) {
+function multipleRender(ignore_active = false, active_first = true, enforce_style = true, draw_only_cps = false, clear = false) {
+    if(clear){
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
     let active_path = project.paths[project.active_path]
     let active = project.active_path
     //ctx.clearRect(0, 0, canvas.width, canvas.height);
