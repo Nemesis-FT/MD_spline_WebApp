@@ -128,7 +128,9 @@ function gridPoint(ipoint) {
  * @param e an event
  * @returns {boolean}:
  */
-canvas.oncontextmenu = function (e) {
+
+
+function contextMenu(e) {
     e.preventDefault();
     if (initButton) {
         if (IDpointCurve !== -1) {
@@ -145,7 +147,7 @@ canvas.oncontextmenu = function (e) {
         //inseriti i CP iniziali e poi terminati con button destro
         initButton = true;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        paramd = _.cloneDeep(project.paths[project.active_path].getParamd());
+        paramd = _.cloneDeep(project.paths[project.active_path].getBlankParamd());
         var degree = Number($('#degree').val());
         var continuity = Number($('#continuity').val());
 
@@ -630,26 +632,9 @@ function mouseMoveFunction(e) {
 function setEvalPoints() {
     value = document.getElementById("npoint").value
     NUMBER_POINT = Number(value)
-    paramd = _.cloneDeep(project.paths[project.active_path].getParamd());
-    var degree = Number($('#degree').val());
-    var continuity = Number($('#continuity').val());
+    initButton = false
 
-    paramd.degree.push(degree);
-    var period = $('#continuityValue').val();
-
-    if (grid_flag === 1)
-        create_grid(gridx, gridy);
-
-    NUMBER_POINT = Number($('#npoint').val());
-    let myStruct = mainVD_MDspl_new(paramd, (Number(period) + Number(controlPoint.length) + 1), Number(period), degree, continuity, NUMBER_POINT);
-    paramd = _.cloneDeep(myStruct.param);
-    bs = myStruct.myStruct.bs;
-    fl = myStruct.myStruct.fl;
-
-    createPoint(controlPoint, 'black', Number(period));
-    pointShape = calculateMatrixControl(bs, fl, controlPoint, pointShape, Number(period));
-    createPoint(pointShape, 'green', Number(period));
-    appendInfo(paramd);
+    contextMenu(new Event("contextmenu"))
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     multipleRender()
 }

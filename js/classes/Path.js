@@ -59,6 +59,23 @@ class Path{
         return this.paramd;
     }
 
+    getBlankParamd(){
+        return {
+            degree: [],
+            continuity: [],
+            ampiezzaSegmenti: [1],
+            estremoA: 0,
+            estremoB: 0,
+            breakPoint: [],
+            indicePrimoBreakPoint: 0,
+            indiceUltimoBreakPoint: 0,
+            partizioneNodaleT: [],
+            partizioneNodaleS: [],
+            indiciPartizioneNodaleT: [],
+            indiciPartizioneNodaleS: []
+        }
+    }
+
     /**
      * This section is responsable for creating the entry in the pathlist on the right sidebar
      * @param container
