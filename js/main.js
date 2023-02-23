@@ -772,6 +772,8 @@ function md_openFile(event) {
         var period = paramd.continuity[paramd.indicePrimoBreakPoint];
         pointShape = redraw(bs, fl, controlPoint, pointShape, period, project.paths[project.active_path].strokeColor, project.paths[project.active_path].fillColor);
         appendInfo(paramd);
+        let fileinput = document.getElementById("input1")
+        fileinput.value = ""
     }
     reader.readAsText(input.files[0]);
 }
@@ -1283,6 +1285,18 @@ function svg_loadFile(event) {
         let parser, svgDoc;
         parser = new DOMParser()
         svgDoc = await parser.parseFromString(text, "image/svg+xml")
+        let gradients = svgDoc.querySelectorAll("linearGradient, radialGradient")
+        if(gradients.length>0){
+            alert("Warning: Gradients have been detected. Gradients are not currently supported by this application.")
+        }
+        let transforms = svgDoc.querySelectorAll("[transform]")
+        if(transforms.length>0){
+            alert("Warning: Transforms have been detected. Transforms are not supported by this application.")
+        }
+        let styles = svgDoc.querySelectorAll("[style]")
+        if(styles.length>0){
+            alert("Warning: styles detected. Styles are not supported by this application.")
+        }
         project.setSvgSource(svgDoc)
         let paths = await svgDoc.querySelectorAll("path, ellipse, rect, circle, line, polyline, polygon")
         for (let i = 0; i < paths.length; i++) {
@@ -1303,6 +1317,8 @@ function svg_loadFile(event) {
         }
         setPathRenderList()
         zoom_whole(event)
+        let fileinput = document.getElementById("input2")
+        fileinput.value = ""
     }
     reader.readAsText(event.target.files[0])
 }
