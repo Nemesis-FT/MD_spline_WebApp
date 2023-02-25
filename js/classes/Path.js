@@ -34,20 +34,24 @@ class Path{
         if(!svgSource){
             return
         }
-        if(svgSource.getAttribute("stroke") && svgSource.getAttribute("stroke")!=="null" && svgSource.getAttribute("stroke")!=="transparent"){
+        if(svgSource.getAttribute("stroke") && svgSource.getAttribute("stroke")!=="null" && svgSource.getAttribute("stroke")!=="none" && svgSource.getAttribute("stroke")!=="transparent"){
             this.r_strokeColor = colorConverter(svgSource.getAttribute("stroke"))
         }
         else{
             this.r_strokeColor = "#000000"
             this.borderTransparent = true
         }
-        if(svgSource.getAttribute("fill") && svgSource.getAttribute("fill")!=="null" && svgSource.getAttribute("fill")!=="transparent") {
+        if(svgSource.getAttribute("fill") && svgSource.getAttribute("fill")!=="null" && svgSource.getAttribute("fill")!=="none" && svgSource.getAttribute("fill")!=="transparent") {
             this.r_fillColor = colorConverter(svgSource.getAttribute("fill"))
+            this.fillTransparent = false
         }
         else{
             this.r_fillColor = "#000000"
-            if(svgSource.getAttribute("fill")==="transparent"){
+            if(!svgSource.getAttribute("fill") || svgSource.getAttribute("fill")==="transparent" || svgSource.getAttribute("fill")==="none"){
                 this.fillTransparent = true
+            }
+            if(!svgSource.getAttribute("fill")){
+                this.borderTransparent = false
             }
         }
         this.fillColor = this.r_fillColor
