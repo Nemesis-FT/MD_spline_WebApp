@@ -184,6 +184,8 @@ function contextMenu(e) {
         pointShape = calculateMatrixControl(bs, fl, controlPoint, pointShape, Number(period));
         createPoint(pointShape, 'green', Number(period));
         appendInfo(paramd);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        multipleRender()
 
         return false;
     }
