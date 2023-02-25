@@ -2071,16 +2071,37 @@ function upapprox(event) {
  * @param controlPoint
  * @returns {{cx: number, cy: number}}
  */
-function baricenter(controlPoint) {
-    var arrayX = [];
-    var arrayY = [];
-    for (var i = 0; i < controlPoint.length; i++) {
-        arrayX.push(controlPoint[i].x);
-        arrayY.push(controlPoint[i].y);
+function baricenter() {
+    if(transform_multilayer){
+        console.debug("MULTI")
+        let active = project.active_path
+        let pts = []
+        for (let k = 0; k < project.paths.length; k++) {
+            selectPath(project.paths[k].id, false, true)
+            for (let i = 0; i < controlPoint.length; i++) {
+                pts.push([controlPoint[i].x, controlPoint[i].y])
+            }
+        }
+        selectPath(project.paths[active].id, false, true)
+
+        // Bounding box calculation
+        let result = findBounds(pts)
+        let cx = 0.5 * (result[0][0]+result[1][0]);
+        let cy = 0.5 * (result[0][1]+result[1][1]);
+        return {cx: cx, cy: cy};
     }
-    var cx = 0.5 * (_.min(arrayX) + _.max(arrayX));
-    var cy = 0.5 * (_.min(arrayY) + _.max(arrayY));
-    return {cx: cx, cy: cy};
+    else{
+        var arrayX = [];
+        var arrayY = [];
+        for (var i = 0; i < controlPoint.length; i++) {
+            arrayX.push(controlPoint[i].x);
+            arrayY.push(controlPoint[i].y);
+        }
+        var cx = 0.5 * (_.min(arrayX) + _.max(arrayX));
+        var cy = 0.5 * (_.min(arrayY) + _.max(arrayY));
+        return {cx: cx, cy: cy};
+    }
+
 }
 
 /**
@@ -2090,6 +2111,9 @@ function baricenter(controlPoint) {
 function rotate(event) {
     event.preventDefault();
     if (inblock) return;
+    var bar = baricenter();
+    var cx = bar.cx;
+    var cy = bar.cy;
     if (initButton) {
         //Ruota di 90 gradi in senso antiorario i CP rispetto al proprio baricentro e ridisegna
         let active = project.active_path;
@@ -2098,9 +2122,7 @@ function rotate(event) {
                 continue;
             }
             selectPath(project.paths[k].id, false, true)
-            var bar = baricenter(controlPoint);
-            var cx = bar.cx;
-            var cy = bar.cy;
+
             var cc = Math.cos(Math.PI / 2);
             var ss = Math.sin(Math.PI / 2);
             var temp;
@@ -2134,7 +2156,9 @@ function rotate(event) {
 function mirrorX(event) {
     event.preventDefault();
     if (inblock) return;
-
+    var bar = baricenter();
+    var cx = bar.cx;
+    var cy = bar.cy;
     if (initButton) {
         //Determina i CP simmetrici rispetto all'asse X per il proprio baricentro e ridisegna
         let active = project.active_path;
@@ -2143,9 +2167,7 @@ function mirrorX(event) {
                 continue;
             }
             selectPath(project.paths[k].id, false, true)
-            var bar = baricenter(controlPoint);
-            var cx = bar.cx;
-            var cy = bar.cy;
+
             for (var i = 0; i < controlPoint.length; i++) {
                 controlPoint[i].y = -controlPoint[i].y + 2 * cy;
             }
@@ -2174,7 +2196,9 @@ function mirrorX(event) {
 function mirrorY(event) {
     event.preventDefault();
     if (inblock) return;
-
+    var bar = baricenter();
+    var cx = bar.cx;
+    var cy = bar.cy;
     if (initButton) {
         //Determina i CP simmetrici rispetto all'asse Y per il proprio baricentro e ridisegna
         let active = project.active_path;
@@ -2183,9 +2207,7 @@ function mirrorY(event) {
                 continue;
             }
             selectPath(project.paths[k].id, false, true)
-            var bar = baricenter(controlPoint);
-            var cx = bar.cx;
-            var cy = bar.cy;
+
             for (var i = 0; i < controlPoint.length; i++) {
                 controlPoint[i].x = -controlPoint[i].x + 2 * cx;
             }
