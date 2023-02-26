@@ -212,7 +212,7 @@ function removePathById(id) {
     active = project.paths[project.active_path].id
     selectPath(id, false, true)
     removePath(active)
-    selectPath(active, false, false)
+    selectPath(active, true, false)
 }
 
 /**
