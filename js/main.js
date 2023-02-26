@@ -213,6 +213,9 @@ function removePathById(id) {
     selectPath(id, false, true)
     removePath(active)
     selectPath(active, true, false)
+    if(renderList.length!=0){
+        setPathRenderList()
+    }
 }
 
 /**
